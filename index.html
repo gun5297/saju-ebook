@@ -1,0 +1,3338 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="theme-color" content="#1e1e1e">
+<title>사주첩경 권이 - 응용추리편</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #f5f0e8;
+    --page-bg: #fffdf7;
+    --text: #1a1a1a;
+    --accent: #8b7355;
+    --border: #d5cfc0;
+    --bar-bg: #1e1e1e;
+    --bar-text: #e0e0e0;
+    --font-size: 17px;
+  }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--bar-bg);
+    writing-mode: horizontal-tb;
+  }
+
+  body {
+    font-family: 'Nanum Myeongjo', 'Batang', 'BatangChe', serif;
+    font-size: var(--font-size);
+    line-height: 1.9;
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* === Top Bar === */
+  .top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 48px;
+    min-height: 48px;
+    padding: 0 14px;
+    background: var(--bar-bg);
+    color: var(--bar-text);
+    flex-shrink: 0;
+    z-index: 100;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    user-select: none;
+  }
+
+  .top-bar button {
+    background: none;
+    border: none;
+    color: var(--bar-text);
+    font-size: 22px;
+    padding: 6px 10px;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background 0.15s;
+  }
+  .top-bar button:active { background: rgba(255,255,255,0.1); }
+
+  .book-title-bar {
+    font-size: 14px;
+    font-weight: 700;
+    opacity: 0.85;
+    letter-spacing: 0.5px;
+  }
+
+  /* === Book Container === */
+  .book-container {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* === Pages === */
+  .page {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding: 28px 22px 60px;
+    background: var(--page-bg);
+    writing-mode: horizontal-tb !important;
+  }
+
+  .page.active {
+    display: block;
+  }
+
+  .page.page-ending.active {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+
+  /* Center content on wide screens */
+  .page-inner {
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  /* === Bottom Bar === */
+  .bottom-bar {
+    flex-shrink: 0;
+    background: var(--bar-bg);
+    padding: 8px 14px 14px;
+    z-index: 100;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    user-select: none;
+  }
+
+  .progress-bar {
+    height: 3px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.35s ease;
+    width: 0%;
+  }
+
+  .nav-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+  }
+
+  .nav-btn {
+    background: none;
+    border: 1px solid rgba(255,255,255,0.15);
+    color: var(--bar-text);
+    font-size: 22px;
+    width: 44px;
+    height: 36px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+  }
+  .nav-btn:active { background: rgba(255,255,255,0.1); }
+
+  .page-indicator {
+    color: var(--bar-text);
+    font-size: 13px;
+    opacity: 0.65;
+    min-width: 60px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* === Typography === */
+  h1 {
+    font-size: 24px;
+    font-weight: 800;
+    text-align: center;
+    margin: 16px 0 20px;
+    line-height: 1.5;
+  }
+
+  h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 18px 0 12px;
+    line-height: 1.5;
+  }
+
+  h3 {
+    font-size: 17px;
+    font-weight: 700;
+    margin: 14px 0 8px;
+    line-height: 1.5;
+  }
+
+  p {
+    margin: 10px 0;
+    text-align: justify;
+    word-break: keep-all;
+  }
+
+  .topic-title {
+    font-size: 20px;
+    font-weight: 700;
+    text-align: center;
+    border-top: 2px solid #333;
+    border-bottom: 2px solid #333;
+    padding: 12px 0;
+    margin: 0 0 24px;
+    line-height: 1.5;
+  }
+
+  .condition-list {
+    margin: 14px 0;
+    padding-left: 0;
+  }
+
+  .condition-list li {
+    list-style: none;
+    margin: 8px 0;
+    padding-left: 12px;
+    position: relative;
+  }
+
+  .reasoning {
+    margin: 20px 0;
+    padding: 16px;
+    background: rgba(139,115,85,0.06);
+    border-radius: 8px;
+    border-left: 3px solid var(--accent);
+  }
+
+  .reasoning::before {
+    content: "\25CB  추리";
+    font-weight: 700;
+    display: block;
+    margin-bottom: 8px;
+    color: var(--accent);
+  }
+
+  .example-section {
+    margin: 20px 0;
+  }
+
+  .example-section::before {
+    content: "\25CB  실례";
+    font-weight: 700;
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  .reference {
+    margin: 20px 0;
+    padding: 14px;
+    background: rgba(0,0,0,0.03);
+    border-radius: 8px;
+  }
+
+  .reference::before {
+    content: "\25CB  참고";
+    font-weight: 700;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .experience {
+    margin: 16px 0;
+    padding: 14px;
+    background: rgba(0,0,0,0.03);
+    border-radius: 8px;
+  }
+
+  .experience::before {
+    content: "〈경험〉";
+    font-weight: 700;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  /* === Saju Charts === */
+  .saju-chart {
+    display: inline-block;
+    margin: 14px 10px;
+    vertical-align: middle;
+  }
+
+  .saju-chart table {
+    border-collapse: collapse;
+    font-size: 16px;
+  }
+
+  .saju-chart td {
+    width: 44px;
+    height: 38px;
+    text-align: center;
+    border: 1px solid #555;
+    padding: 3px;
+  }
+
+  .saju-chart .header td {
+    font-size: 12px;
+    background: #f0ede6;
+    height: 26px;
+    color: #666;
+    font-weight: 600;
+  }
+
+  .saju-label {
+    font-size: 15px;
+    margin: 16px 0 6px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  /* === Special Pages === */
+  .title-page {
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 50px 24px;
+  }
+
+  .title-page .author {
+    font-size: 20px;
+    margin-bottom: 28px;
+    letter-spacing: 2px;
+  }
+
+  .title-page .subtitle {
+    font-size: 17px;
+    margin-bottom: 16px;
+    color: #666;
+  }
+
+  .title-page .main-title {
+    font-size: 34px;
+    font-weight: 800;
+    margin-bottom: 12px;
+    letter-spacing: 4px;
+  }
+
+  .title-page .volume {
+    font-size: 22px;
+    margin-bottom: 36px;
+  }
+
+  .title-page .publisher {
+    font-size: 14px;
+    color: #888;
+    letter-spacing: 1px;
+  }
+
+  .bal-section { text-align: center; }
+
+  .bal-title {
+    font-size: 24px;
+    margin: 20px 0;
+    text-align: center;
+  }
+
+  .toc-entry {
+    margin: 6px 0;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .toc-number { font-weight: 700; }
+
+  .separator {
+    border: none;
+    border-top: 1px dashed #ccc;
+    margin: 28px 0;
+  }
+
+  .page-num {
+    font-size: 13px;
+    color: #888;
+    text-align: center;
+    margin-top: 14px;
+  }
+
+  .small-note {
+    font-size: 14px;
+    color: #777;
+    margin: 10px 0 4px;
+  }
+
+  .indent { text-indent: 1.5em; }
+  .center-text { text-align: center; }
+
+  ruby { ruby-position: over; }
+  rt { font-size: 0.6em; color: #c00; }
+
+  /* === TOC Sidebar === */
+  .toc-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 300px;
+    max-width: 80vw;
+    height: 100%;
+    background: #1a1a1a;
+    color: #ddd;
+    z-index: 300;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    padding: 0;
+  }
+
+  .toc-sidebar.open {
+    transform: translateX(0);
+  }
+
+  .toc-header {
+    padding: 18px 20px 14px;
+    font-size: 16px;
+    font-weight: 700;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    color: #fff;
+    position: sticky;
+    top: 0;
+    background: #1a1a1a;
+    z-index: 1;
+  }
+
+  .toc-item {
+    display: block;
+    padding: 12px 20px;
+    color: #bbb;
+    font-size: 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    cursor: pointer;
+    transition: background 0.15s;
+    line-height: 1.5;
+  }
+
+  .toc-item:active,
+  .toc-item.current {
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+  }
+
+  .toc-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 250;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .toc-overlay.open {
+    display: block;
+    opacity: 1;
+  }
+
+  /* === Font Size Settings === */
+  .settings-popup {
+    display: none;
+    position: fixed;
+    top: 48px;
+    right: 10px;
+    background: #2a2a2a;
+    border-radius: 12px;
+    padding: 16px;
+    z-index: 200;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    min-width: 180px;
+  }
+
+  .settings-popup.open { display: block; }
+
+  .settings-label {
+    color: #999;
+    font-size: 12px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .size-options {
+    display: flex;
+    gap: 8px;
+  }
+
+  .size-btn {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: none;
+    color: #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.15s;
+  }
+
+  .size-btn:active,
+  .size-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  /* === Theme Options === */
+  .theme-options {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  .theme-btn {
+    flex: 1;
+    height: 32px;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+
+  .theme-btn.active { border-color: var(--accent); }
+  .theme-btn.light { background: #fffdf7; }
+  .theme-btn.sepia { background: #f4e8d1; }
+  .theme-btn.dark { background: #1a1a1a; }
+
+  /* Dark theme */
+  body.theme-dark {
+    --page-bg: #1a1a1a;
+    --text: #ccc;
+  }
+  body.theme-dark .page { background: #1a1a1a; }
+  body.theme-dark .saju-chart td { border-color: #555; color: #ccc; }
+  body.theme-dark .saju-chart .header td { background: #2a2a2a; color: #999; }
+  body.theme-dark .topic-title { border-color: #555; }
+  body.theme-dark .reasoning { background: rgba(139,115,85,0.1); }
+  body.theme-dark .reference,
+  body.theme-dark .experience { background: rgba(255,255,255,0.04); }
+
+  /* Sepia theme */
+  body.theme-sepia {
+    --page-bg: #f4e8d1;
+    --text: #3d3225;
+  }
+  body.theme-sepia .page { background: #f4e8d1; }
+
+  /* === Safe area for notched phones === */
+  @supports (padding: env(safe-area-inset-bottom)) {
+    .bottom-bar {
+      padding-bottom: calc(14px + env(safe-area-inset-bottom));
+    }
+    .top-bar {
+      padding-top: env(safe-area-inset-top);
+      height: calc(48px + env(safe-area-inset-top));
+      min-height: calc(48px + env(safe-area-inset-top));
+    }
+  }
+
+  /* === Responsive === */
+  @media (min-width: 768px) {
+    .page {
+      padding: 36px 48px 60px;
+    }
+    body { --font-size: 18px; }
+    .topic-title { font-size: 22px; }
+    h1 { font-size: 26px; }
+  }
+
+  @media (min-width: 1024px) {
+    .page {
+      padding: 48px 64px 60px;
+    }
+    body { --font-size: 19px; }
+  }
+
+  /* Scrollbar for pages */
+  .page::-webkit-scrollbar { width: 4px; }
+  .page::-webkit-scrollbar-track { background: transparent; }
+  .page::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 2px; }
+
+  /* Print */
+  @media print {
+    .top-bar, .bottom-bar, .toc-sidebar, .toc-overlay, .settings-popup { display: none !important; }
+    .book-container { overflow: visible !important; }
+    .page { display: block !important; position: relative !important; overflow: visible !important; page-break-after: always; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<header class="top-bar">
+  <button onclick="toggleTOC()" aria-label="목차">&#9776;</button>
+  <span class="book-title-bar">사주첩경 권이</span>
+  <button onclick="toggleSettings()" aria-label="설정">Aa</button>
+</header>
+
+<!-- Settings Popup -->
+<div class="settings-popup" id="settingsPopup">
+  <div class="settings-label">글자 크기</div>
+  <div class="size-options">
+    <button class="size-btn" onclick="setFontSize(15)" data-size="15">가</button>
+    <button class="size-btn active" onclick="setFontSize(17)" data-size="17">가</button>
+    <button class="size-btn" onclick="setFontSize(20)" data-size="20">가</button>
+    <button class="size-btn" onclick="setFontSize(23)" data-size="23">가</button>
+  </div>
+  <div class="settings-label" style="margin-top:14px">배경</div>
+  <div class="theme-options">
+    <button class="theme-btn light active" onclick="setTheme('light')"></button>
+    <button class="theme-btn sepia" onclick="setTheme('sepia')"></button>
+    <button class="theme-btn dark" onclick="setTheme('dark')"></button>
+  </div>
+</div>
+
+<!-- TOC Sidebar -->
+<aside class="toc-sidebar" id="tocSidebar">
+  <div class="toc-header">목차</div>
+</aside>
+<div class="toc-overlay" id="tocOverlay" onclick="toggleTOC()"></div>
+
+<!-- Book Content -->
+<main class="book-container" id="bookContainer">
+
+<!-- ===== 표지 ===== -->
+<section class="page title-page">
+  <p class="author">이석영 저</p>
+  <p class="subtitle">（응용추리편）</p>
+  <p class="main-title">사주첩경</p>
+  <p class="volume">권이</p>
+  <br><br>
+  <p class="publisher">관인 한국역학교육학원 발행</p>
+</section>
+
+<!-- ===== 발(跋) ===== -->
+<section class="page">
+  <div class="bal-title">◇ 발 ◇</div>
+  <p class="indent">
+    인간세상에는 각종 분야의 하는 사람이 또 따로 있다. 그런데 자기가 할 일이 아닌데도 분수를 모르고 뛰어들어 욕심으로 하려고 있다면 그것은 실패요 불후로 돌아가고 만다.
+  </p>
+  <p class="indent">
+    그러면 우리 역학자가 하여야 할 분야의 일들은 무엇인가, 그 말은 데에서 그 사람이 반드시 알고서야 하여야 할 분야의 일들을 지도하여 주는 것이다. 그러나 그 선저자는 반드시 알고서야 하는 법이기 때문에 힘이 든다. 그러나 일계나 시대는 변화하고 또한 사주 전환하는 것이므로 그 하여야 할 일도 변화하지 않으면 아니 된 일이 새로 생기기도 하며 우리 역학자가 이 운세에 따라 변화하지 않고도 전연 아지 못할 새로운 점도 많이 생겼다. 그래서 나는 이 빈 공간을 다소나마 하는데 도움이 될 수 있도록 연구하여 본 그대로 기술한 것이 이 첩경 이권·삼권이다.
+  </p>
+  <p class="indent">
+    그러므로 이 기술은 인간운명지도에 전체는 아닌것이니 이곳에 어떠한 살을 하나 가지고 일가일부를 논단하는 것은 매우 큰 잘못이다. 격국용신 사주가 있고도 위에 환원사주가 있다. 이곳의 신살육친간명결과 격살·양인살이 있고도 끝으로 하나의 예만 들어서 있으면 그 살이 있어도 물론 에게 정신적 타격을 크게 주기까지 하는 것이니 매우 불가하다고 말하는 것은 남서 이번에 이 책을 내기로 하는 것이다. 주의하며 줄 것을 부탁하면 좋겠다.
+  </p>
+</section>
+
+<!-- ===== 목차 ===== -->
+<section class="page">
+  <h1>사주첩경 권이 목차</h1>
+
+  <p class="toc-entry"><span class="toc-number">서문</span></p>
+  <p class="toc-entry"><span class="toc-number">一、</span>고향을 떠나 산다</p>
+  <p class="toc-entry"><span class="toc-number">二、</span>선조 봉사에 무성의하다</p>
+  <p class="toc-entry"><span class="toc-number">三、</span>부모·형제간의 불화하다</p>
+  <p class="toc-entry"><span class="toc-number">四、</span>조부 흉사한다</p>
+  <p class="toc-entry"><span class="toc-number">五、</span>부친 횡사한다（혹 불구잔질）</p>
+  <p class="toc-entry"><span class="toc-number">六、</span>모친 흉사한다（혹 불구잔질）</p>
+  <p class="toc-entry"><span class="toc-number">七、</span>모친 재가（또는 소실로 시집갔다）</p>
+  <p class="toc-entry"><span class="toc-number">八、</span>다른 어머니 밑에서 모셔본다</p>
+  <p class="toc-entry"><span class="toc-number">九、</span>다른 부모밖에 맡겨본다</p>
+  <p class="toc-entry"><span class="toc-number">一〇、</span>형제 자매간에 흉사 있다</p>
+  <p class="toc-entry"><span class="toc-number">一一、</span>외삼촌·처남남이 고독하다</p>
+  <p class="toc-entry"><span class="toc-number">一二、</span>조모 또는 장모 두분 모셔 본다</p>
+  <p class="toc-entry"><span class="toc-number">一三、</span>장모 봉양할 일이 있어 모신다（여명기준）</p>
+  <p class="toc-entry"><span class="toc-number">一四、</span>화상에 횡사 있다</p>
+  <p class="toc-entry"><span class="toc-number">一五、</span>감금에 있다</p>
+  <p class="toc-entry"><span class="toc-number">一六、</span>수석 있다</p>
+  <p class="toc-entry"><span class="toc-number">一七、</span>정신 이상 있다</p>
+  <p class="toc-entry"><span class="toc-number">一八、</span>성병 또는 기관 장가에 있다</p>
+  <p class="toc-entry"><span class="toc-number">一九、</span>비위가 또는 맹장 앓아본다</p>
+  <p class="toc-entry"><span class="toc-number">二〇、</span>안질 이상 또는 맹인 본다</p>
+  <p class="toc-entry"><span class="toc-number">二一、</span>자녀도등 장가 관리에 있다</p>
+  <p class="toc-entry"><span class="toc-number">二二、</span>수석 있다</p>
+  <p class="toc-entry"><span class="toc-number">二三、</span>비위가 또는 맹장 약아본다</p>
+  <p class="toc-entry"><span class="toc-number">二四、</span>폐위가 또는 기관지 있다</p>
+  <p class="toc-entry"><span class="toc-number">二五、</span>고혈압 또는 저혈압 본다</p>
+  <p class="toc-entry"><span class="toc-number">二六、</span>수족에 이상 있다</p>
+  <p class="toc-entry"><span class="toc-number">二七、</span>정신 이상 있다</p>
+  <p class="toc-entry"><span class="toc-number">二八、</span>문둥이 또는 봉창염 앓아본다</p>
+  <p class="toc-entry"><span class="toc-number">二九、</span>성병 또는 성기에 관한 장가가리에 오줌산다</p>
+  <p class="toc-entry"><span class="toc-number">三〇、</span>해산 난산하다</p>
+  <p class="toc-entry"><span class="toc-number">三一、</span>유부녀 기졸 장가 오줌산다</p>
+  <p class="toc-entry"><span class="toc-number">三二、</span>자녀도등 관리 있다</p>
+  <p class="toc-entry"><span class="toc-number">三三、</span>경찰공무업</p>
+  <p class="toc-entry"><span class="toc-number">三四、</span>의약업</p>
+  <p class="toc-entry"><span class="toc-number">三五、</span>재정공무업에 진출한다</p>
+  <p class="toc-entry"><span class="toc-number">三六、</span>법조·술계에 진출한다</p>
+  <p class="toc-entry"><span class="toc-number">三七、</span>기생이란</p>
+  <p class="toc-entry"><span class="toc-number">三八、</span>항공계에 하여본다</p>
+  <p class="toc-entry"><span class="toc-number">三九、</span>음식물업 하여본다</p>
+  <p class="toc-entry"><span class="toc-number">四〇、</span>해외출입에 관하다</p>
+  <p class="toc-entry"><span class="toc-number">四一、</span>노상 횡사 있다</p>
+  <p class="toc-entry"><span class="toc-number">四二、</span>외교관이 나가본다</p>
+  <p class="toc-entry"><span class="toc-number">四三、</span>종교 신앙 있다</p>
+  <p class="toc-entry"><span class="toc-number">四四、</span>본처 해로 못한다</p>
+  <p class="toc-entry"><span class="toc-number">四五、</span>악처 만나고 또한 본다</p>
+  <p class="toc-entry"><span class="toc-number">四六、</span>국제결혼 이성에 교정하여 본다</p>
+  <p class="toc-entry"><span class="toc-number">四七、</span>본부처 노쇠자 축첩한다（남명）</p>
+  <p class="toc-entry"><span class="toc-number">四八、</span>재혼자 축첩하여 출혼한다</p>
+  <p class="toc-entry"><span class="toc-number">四九、</span>부군 흉사한다</p>
+  <p class="toc-entry"><span class="toc-number">五〇、</span>재혼 늙쇠 되었다</p>
+  <p class="toc-entry"><span class="toc-number">五一、</span>부군 익사한다</p>
+  <p class="toc-entry"><span class="toc-number">五二、</span>부군 흉사한다</p>
+  <p class="toc-entry"><span class="toc-number">五三、</span>애기 낳고 살다가 도 가출한다</p>
+  <p class="toc-entry"><span class="toc-number">五四、</span>소실 학대 있다</p>
+  <p class="toc-entry"><span class="toc-number">五五、</span>처녀 학대 쉽다</p>
+  <p class="toc-entry"><span class="toc-number">五六、</span>무자하기 쉽다</p>
+  <p class="toc-entry"><span class="toc-number">五七、</span>무자 소실에 득자 쉽다（여명기준）</p>
+  <p class="toc-entry"><span class="toc-number">五八、</span>소실에 득자 쉽다（남명기준）</p>
+  <p class="toc-entry"><span class="toc-number">五九、</span>불구자손 득자하다</p>
+  <p class="toc-entry"><span class="toc-number">六〇、</span>자손 흉사함이 있다（남명기준）</p>
+  <p class="toc-entry"><span class="toc-number">六一、</span>자손 수석 있다</p>
+  <p class="toc-entry"><span class="toc-number">六二、</span>자손 흉사함이 있다（여명기준）</p>
+  <p class="toc-entry"><span class="toc-number">六三、</span>여명 수석에 또한 흉 자손 흉사</p>
+  <p class="toc-entry"><span class="toc-number">六四、</span>옥외에서 출생 자손 흉사</p>
+  <p class="toc-entry"><span class="toc-number">六五、</span>혼혈아를 득자하다</p>
+  <p class="toc-entry"><span class="toc-number">六六、</span>총각이 득자하다</p>
+</section>
+
+<!-- ===== 본문 시작 ===== -->
+
+<!-- 一、고향을 떠나 산다 -->
+<section class="page" id="topic-1">
+  <h2 class="topic-title">一、고향을 떠나 산다</h2>
+
+  <ol class="condition-list">
+    <li>1. 년입 또는 일입지살 한 자</li>
+    <li>2. 일월이 상충 또는 상형 한 자</li>
+    <li>3. 월건에 공망인 자</li>
+  </ol>
+
+  <div class="reasoning">
+    <p class="indent">
+      생년은 선조요 고기다. 생일은 기신이요 지살은 답지 땅을 밟는 것이다. 고로 년입지살 또는 일입지살 한 자는 고기를 떠나 이곳 저곳 타향살이를 하는 것이요. 또 월건은 부모궁이요 상충은 이별이요 상형은 난탈배반하는 것이므로 일월충도 부모를 떠나 타향살이를 하는 것이다. 또 월건은 부모궁 주 고기요 공망은 파괴요 황폐함이다. 고로 월건공망도 타향살이 한다.
+    </p>
+  </div>
+
+  <div class="example-section">
+    <p class="saju-label">1의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>을</td><td>갑</td><td>무</td><td>경</td></tr>
+        <tr><td>해</td><td>자</td><td>인</td><td>신</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 신생으로서 일지의 해가 년지의 신을 지살하고 있다. 따라서 평생 타향살이를 한다.</p>
+
+    <p class="saju-label">2의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>갑</td><td>병</td><td>임</td><td>갑</td></tr>
+        <tr><td>인</td><td>인</td><td>진</td><td>자</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 일월이 상충하고 있어 고향을 떠나 산다. 따라서 평생 타향살이를 한다.</p>
+
+    <p class="saju-label">3의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>신</td><td>갑</td><td>계</td><td>계</td></tr>
+        <tr><td>축</td><td>신</td><td>미</td><td>미</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 월건에 공망이 되어 고향을 떠나 타향살이를 한다.</p>
+  </div>
+</section>
+
+<!-- 二、선조 봉사에 무성의하다 -->
+<section class="page" id="topic-2">
+  <h2 class="topic-title">二、선조 봉사에 무성의하다</h2>
+
+  <ol class="condition-list">
+    <li>1. 일건생년 한 자</li>
+    <li>2. 년 일이 충형 또는 공망 한 자</li>
+  </ol>
+
+  <div class="reasoning">
+    <p class="indent">
+      생일은 기신이요 생년은 선조다. 따라서 일건생년은 기신이 조부를 건배하는 것이면 제이라 하는 것이요, 충은 난탈이요, 공망은 황폐지상으로 일건생년이나 일과 년이 충·형·공망 한 자는 모두 조상의 은덕을 잊추하며 선조봉사에 무성의하게 된다.
+    </p>
+  </div>
+
+  <div class="example-section">
+    <p class="saju-label">1의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>정</td><td>갑</td><td></td><td></td></tr>
+        <tr><td>묘</td><td>자</td><td></td><td></td></tr>
+      </table>
+    </div>
+    <p>삶이 한다.</p>
+
+    <p class="saju-label">2의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>기</td><td></td><td></td><td></td></tr>
+        <tr><td>사</td><td></td><td></td><td></td></tr>
+      </table>
+    </div>
+    <p>있어 그 향을 떠나 산다.</p>
+
+    <p class="saju-label">3의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>갑</td><td>계</td><td>을</td><td>계</td></tr>
+        <tr><td>축</td><td>묘</td><td>유</td><td>유</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 일주 묘시 월건에 임하여 다방살이 한다.</p>
+  </div>
+</section>
+
+<!-- 三、부모·형제간의 불화하다 -->
+<section class="page" id="topic-3">
+  <h2 class="topic-title">三、부모·형제간의 불화하다</h2>
+
+  <ol class="condition-list">
+    <li>1. 일월이 상형 또는 공망 한 자</li>
+    <li>2. 년 일이 충형 도는 공망 한 자</li>
+  </ol>
+
+  <div class="reasoning">
+    <p class="indent">
+      일은 기신이요, 월은 부모·형제다. 연인비 충은 충돌 쟁의이요, 형은 무례·가례에 몰지각·지세하는 것이며, 원한은 불가 되므로 일은 기신이요, 월은 부모궁이요, 상형은 난탈배반 하는 것이다.
+    </p>
+  </div>
+
+  <div class="example-section">
+    <p class="saju-label">1의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>무</td><td>계</td><td>임</td><td>병</td></tr>
+        <tr><td>신</td><td>사</td><td>인</td><td>묘</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 생일 계수가 생년 병화를 건하여 선조봉사에 무성의하다. 진과 충하여 선조봉사에 무성의하다.</p>
+
+    <p class="saju-label">2의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>신</td><td>경</td><td>정</td><td>경</td></tr>
+        <tr><td>사</td><td>술</td><td>사</td><td>인</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 생일 술과 생월 사가 상형하고 있어 부모와 형제간의 불화한다.</p>
+  </div>
+</section>
+
+<!-- 四、조부 흉사한다 -->
+<section class="page" id="topic-4">
+  <h2 class="topic-title">四、조부 흉사한다</h2>
+
+  <ol class="condition-list">
+    <li>1. 편인이 달형·궁살한 자</li>
+    <li>2. 편인에이 달백호대살한 자</li>
+  </ol>
+
+  <div class="reasoning">
+    <p class="indent">
+      편인은 조부요. 상격·상궁은 달변지상이요, 또 백호대살은 혈광신으로 대흉지상이요, 또 상격은 달변지상이므로 편인이 달형·궁살·백호대살 한 자는 조부가 흉사하게 되는 것이다.
+    </p>
+  </div>
+
+  <div class="example-section">
+    <p class="saju-label">1의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>경</td><td>갑</td><td>신</td><td>갑</td></tr>
+        <tr><td>오</td><td>자</td><td>사</td><td>인</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 생일 갑목와 생월 을이가 상형을 하여 생월 을이 자로 대불화한 사주다.</p>
+
+    <p class="saju-label">2의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>을</td><td>을</td><td>병</td><td>을</td></tr>
+        <tr><td>미</td><td>자</td><td>자</td><td>술</td></tr>
+      </table>
+    </div>
+    <p>이 사주의 편인 성토가 월상 계수가 유수하고 그의 조부가 흉사하였다.</p>
+  </div>
+
+  <div class="reference">
+    <p class="indent">
+      편인은 조부요, 상격·상궁은 기르크로 상이요 또 백호대살은 혈광신으로 대흉지상이요, 인목에의 편인이 달 흉살을 만나고 있어 그의 조부가 흉사하였다. 갑목대의 편인은 이미 정화이고, 을미대의 편인은 축이다. 이를 합하여 참고하면 된다.
+    </p>
+  </div>
+</section>
+
+<!-- 五、부친 횡사한다（혹 불구잔질） -->
+<section class="page" id="topic-5">
+  <h2 class="topic-title">五、부친 횡사한다（혹 불구잔질）</h2>
+
+  <ol class="condition-list">
+    <li>편재에 백호대살이면 부친횡사</li>
+    <li>갑일대 을미일생은 모두 부친 흉사</li>
+  </ol>
+
+  <div class="reasoning">
+    <p class="indent">
+      편재는 부친이요, 백호대살은 혈광신으로 대흉지상이요, 또 일주에 직접 백호대살이 되면 부친횡사 하되는 직접이다. 연인대 모두 부친흉사가 되어도 타주에 아니더라도 타주에 있어도 부친 횡사한다.
+    </p>
+  </div>
+
+  <div class="example-section">
+    <p class="saju-label">1의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td></td><td>갑</td><td>임</td><td>경</td></tr>
+        <tr><td></td><td>진</td><td>술</td><td>신</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 갑진일 편재일로 백호대살이며, 갑일대 을미일생으로 부친이 횡사하였다. 연인대 모두 부친흉사다. 일주에 직접 백호대살이 되어 부친횡사한다.</p>
+
+    <p class="saju-label">2의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>갑</td><td>을</td><td>정</td><td>갑</td></tr>
+        <tr><td>진</td><td>축</td><td>미</td><td>오</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 을축일로서 갑목 편재가 백호대살이 되어 부친이 총탄에 피살 당하여 사망한 만세사건에 영향의 결과이었다.</p>
+
+    <p class="saju-label">실례 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>무</td><td>갑</td><td>정</td><td>갑</td></tr>
+        <tr><td>진</td><td>진</td><td>유</td><td>인</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 미신일시 갑일생이나 일월건진 편재가 백호대살이 되었다. 중생금 시상 무토가 크게 교하며 그의 조모가 내기 낳고 세상에 떠났다.</p>
+
+    <p class="small-note">〈연구응용〉</p>
+    <p class="indent">
+      백호대살에 대해 자세히 알아보면, 편재는 부친이요, 또 백호대살을 만나서 그의 부친·자부·숙부에게까지 흉사가 미치는 것이다. 그리고 또 숙부·백부（정재）가 모두 흉사되는 사주다.
+    </p>
+  </div>
+</section>
+
+<!-- 六、모친 흉사한다（혹 불구잔질） -->
+<section class="page" id="topic-6">
+  <h2 class="topic-title">六、모친 흉사한다（혹 불구잔질）</h2>
+
+  <p>백호대살</p>
+
+  <ol class="condition-list">
+    <li>1. 인수가림 한 자</li>
+    <li>2. 인수가 지기살한 자</li>
+    <li>3. 인수가 건성으로 다봉수건한 자</li>
+  </ol>
+
+  <div class="reasoning">
+    <p class="indent">
+      인수는 모친이요, 백호대살은 혈광신으로 다봉수건한 자는 모친이 형살을 당하다는 것이요, 또 인수가 지기살한 자는 모친이 흉사한다. 그리고 형살은 크게 변을 당하다는 것이요, 또 인수가 건성이면 그의 모친이 자살을 한 것이다.
+    </p>
+  </div>
+
+  <div class="example-section">
+    <p class="saju-label">예 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>갑</td><td>을</td><td>병</td><td>경</td></tr>
+        <tr><td>오</td><td>해</td><td>오</td><td>오</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 을일생인의 편재 부친의 동생인 을축이 사중에 백호대살이 되어 부친이 육오 동란시 폭살했다.</p>
+
+    <p class="saju-label">예 나</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>갑</td><td>을</td><td>정</td><td>갑</td></tr>
+        <tr><td>진</td><td>축</td><td>미</td><td>인</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 병일생인의 편재 부친이 갑목으로 백호대살하고 그의 부친이 총탄에 피살 당하였다.</p>
+
+    <p class="saju-label">예 다</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>신</td><td>갑</td><td>병</td><td>경</td></tr>
+        <tr><td>사</td><td>인</td><td>오</td><td>인</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 갑일생인의 편재가 백호대살을 이루고 그의 부친이 할복자살 하였다.</p>
+  </div>
+</section>
+
+<!-- 七、모친 재가（또는 소실로 시집갔다） -->
+<section class="page" id="topic-7">
+  <h2 class="topic-title">七、모친 재가（또는 소실로 시집갔다）</h2>
+
+  <ol class="condition-list">
+    <li>1. 월건도화</li>
+    <li>2. 인수가 자기의 관성과 암합한 자</li>
+    <li>3. 인수가 재와 일지와 암합한 자</li>
+  </ol>
+
+  <div class="reasoning">
+    <p class="indent">
+      월건은 부모궁이요 도화는 음란을 의미함이요, 또 칠살은 패하는 주 한번 실패하는 것이다. 그리고 말하는 것이며, 인수는 모친이요, 자기의 관성(남편)과 비밀합을 의미하고, 재와의 관성·비밀합이란 한 것을 의미한다. 모친의 남편(부친)이요 또 자기의 관성과 공연하게 만나지 못하고 비밀합을 하는 상이 되므로 이와 같이 동인자는 모친이 재가하거나 소실로 시집갔다 하는 것이다.
+    </p>
+  </div>
+
+  <div class="example-section">
+    <p class="saju-label">1의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>경</td><td>갑</td><td>정</td><td>갑</td></tr>
+        <tr><td>오</td><td>오</td><td>묘</td><td>인</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 갑생으로 월건에 묘가 임하여 도화이므로 모친이 인의에 재혼하여 시집갔다.</p>
+
+    <p class="saju-label">2의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>정</td><td>을</td><td>병</td><td>정</td></tr>
+        <tr><td>축</td><td>사</td><td>신</td><td>묘</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 병일생에 을미인수 역시 인생에 임하여 그의 모친이 재혼으로 시집갔다.</p>
+
+    <p class="saju-label">3의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>경</td><td>신</td><td>신</td><td>기</td></tr>
+        <tr><td>인</td><td>묘</td><td>미</td><td>해</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 기토 인수인 모친이가 암합하여 그의 모친이 재혼하였다.</p>
+  </div>
+</section>
+
+<!-- 八、다른 어머니 밑에서 모셔 본다 -->
+<section class="page" id="topic-8">
+  <h2 class="topic-title">八、다른 어머니 밑에서 모셔 본다</h2>
+
+  <p>다봉인수자</p>
+
+  <ol class="condition-list">
+    <li>1. 다봉인수 한 자</li>
+  </ol>
+
+  <div class="reasoning">
+    <p class="indent">
+      인수는 모친인바 사주에 인수가 많으면(다봉은 들어봄을 말함) 여러 어머니를 모시고 본 것이며, 이 전기 칠항에 해당되는 자 없는 경우 이곳에서도 해당된는 것이다. 본처가 있었거나(모친이 재혼하였으므로) 또는 다른 어머니 밑에서 자라 본다 하는 것이다.
+    </p>
+  </div>
+
+  <div class="example-section">
+    <p class="saju-label">1의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>기</td><td>갑</td><td>을</td><td>기</td></tr>
+        <tr><td>미</td><td>술</td><td>묘</td><td>사</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 기일생인이 년지 사중 중 을목을 비롯 상에 을목인수 시의 상 인수가 다봉이므로 사중인수 되어 어머니 여러 번 모셔 보았다.</p>
+
+    <p class="saju-label">예 나</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>정</td><td>계</td><td>을</td><td>정</td></tr>
+        <tr><td>축</td><td>해</td><td>묘</td><td>유</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 갑일생에 년지 해중 중 을목 시지 축중 기토가 인수 사중인수이므로 이 사주 역시 모친이 중이다. 월지 해중 갑목을 은 인수이다.</p>
+  </div>
+</section>
+
+<!-- 九、다른 부모밖에 맡겨본다 -->
+<section class="page" id="topic-9">
+  <h2 class="topic-title">九、다른 부모밖에 맡겨본다</h2>
+
+  <ol class="condition-list">
+    <li>1. 일좌 재성이 타주 재와 연합한 자</li>
+  </ol>
+
+  <div class="reasoning">
+    <p class="indent">
+      생일은 기신이요 재는 부친이다. 편재의 남편（인수의 관살）주 부친이며 또 재는 부친이다. 편재의 비육（인수의 관살）주 부친이며 또 형제간이기도 하다. 편재의 비육 주 부친이며 재 부친이다.
+    </p>
+  </div>
+
+  <div class="example-section">
+    <p class="saju-label">예 라</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>을</td><td>을</td><td>을</td><td>경</td></tr>
+        <tr><td>유</td><td>유</td><td>해</td><td>신</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 년지 금과 일지의 금으로 사본 사주이다.</p>
+  </div>
+</section>
+
+<!-- 一〇、형제 자매간에 흉사 있다 -->
+<section class="page" id="topic-10">
+  <h2 class="topic-title">一〇、형제 자매간에 흉사 있다</h2>
+
+  <div class="reference">
+    <p class="indent">
+      합이란 것은 삼합, 육합을 포함하는 것이며, 또 고모와 합하는 상이며, 아니면 출생되어 그 부모를 떠나 준삼합과도 합하는 것이다.
+    </p>
+
+    <p>● 준삼합 = 인오합, 사유합, 신자합, 해묘합</p>
+    <p>● 준방합 = 인묘합, 사오합, 신유합, 해자합</p>
+
+    <p class="indent">
+      삼합이나 준삼합, 육합 또는 준방합을 포함하며, 다른 부모 밖에서 자라보거나 합하는 상이 되는 것이다. 숙부, 백부, 고모의 밭에서 자라거나 다른 가에서 자란다 하는 것이다.
+    </p>
+
+    <p class="indent">
+      이상 이를 참에서 합이란 것은 삼합과 육합, 준삼합, 준방합의 분류되어 있다.
+    </p>
+
+    <p class="indent">
+      이곳에서 합이라 하는 것은 삼합, 준방합이라 하고, 삼합이라 명칭은 하였으나, 장기 때문에 준방합이라 하고 있으나, 명칭을 불었으나 그 작용 해당에 있어서는 합과 동합이라고 명칭을 불었고, 합의 작용에서도 동서남북이 비로 같은 뜻이 주 건（성해）, 곤（미신）, 이（진사），감（축인） 의 합을 명칭하게 된 것이다.
+    </p>
+  </div>
+
+  <ol class="condition-list">
+    <li>1. 비견·비겁이 형제자매간이요</li>
+    <li>2. 비견·비겁에 봉충 또는 백호대살 한 자</li>
+    <li>3. 월건에 비견·비겁의 봉충 백호대살 한 자 흉사</li>
+  </ol>
+
+  <div class="reasoning">
+    <p class="indent">
+      비견·비겁은 형제자매간이요 비견은 형제 자매간에 흉살을 맡함이요, 또 비견·비겁에 임하는 상은 형제자매간이 달충하면 성히 약화되어 있는 중 다시 봉충과 관살에 왕한 자 형제자매궁이요. 비견은 형제자매간이 달충하면 흉사 있다고 하는 것이다.
+    </p>
+  </div>
+
+  <div class="example-section">
+    <p class="saju-label">1의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>을</td><td>병</td><td>신</td><td>을</td></tr>
+        <tr><td>해</td><td>인</td><td>사</td><td>미</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 병일생인의 비견 병화가 년지 미와 상충하고 있으므로 형제자매간 관살에 왕하여 비견이 상충하면 흉사 있다고 교통사고로 단상을 당하였다. 다각서 해생 비견이 일지 인중에 암장되어 있으므로 그의 오형제 중 형제가 모두 흉사하였다.</p>
+
+    <p class="saju-label">2의 나</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>갑</td><td>정</td><td>을</td><td>무</td></tr>
+        <tr><td>진</td><td>사</td><td>미</td><td>인</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 기일생인의 비견 기화를 일지 충하고 있다. 그의 형제자매간에 달충과 비견이 상충이 되어 형제 흉사 있다.</p>
+
+    <p class="saju-label">3의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>계</td><td>계</td><td>병</td><td>계</td></tr>
+        <tr><td>축</td><td>묘</td><td>신</td><td>축</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 기일생인의 비견 정화가 달충과 상충으로 아홉 형제 중 동생이 자살한 사주이다. 가 그의 동생이 흉사한다.</p>
+  </div>
+
+  <div class="reference">
+    <p class="small-note">〈참고〉</p>
+    <p class="indent">
+      연해자평 소아론운 「소아재다는 여무염출이며 조년사하」라고 이십육이 이상 있으니 다 음과 같다. 하였다.
+    </p>
+  </div>
+</section>
+
+<!-- 一一、외삼촌·처남남이 고독하다 -->
+<section class="page" id="topic-11">
+  <h2 class="topic-title">一一、외삼촌·처남남이 고독하다</h2>
+
+  <ol class="condition-list">
+    <li>1. 생일에 양차·음차살 있는 자</li>
+    <li>2. 생시에 양차·음차살 있는 자</li>
+  </ol>
+
+  <div class="reasoning">
+    <p class="indent">
+      양차·음차살은 제일진신 갑자에서 시작하며 을해까지 십삼위 외에 신묘 을유에서 제이진신 기묘에서 제삼진신 을사와 제사진신 기사에 내려 십삼위 씩 합쳐 열두 일 즉 이 음양차살은 제일진신 을해까지 십삼위를 벗어나지 않는 것인데 원유한이 남은 삼일이 차착이다. 그런대 이 십이일이 생기도 하고 또는 십오일이 하는 경우도 나타 생하기도 하면 하나의 가문 외에서 취급하여 있으므로 외가에서의 고독함을 나타 주 외삼촌·처남남이 고독하다는 것이다.
+    </p>
+  </div>
+
+  <div class="example-section">
+    <p class="saju-label">1의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>정</td><td>갑</td><td>병</td><td>무</td></tr>
+        <tr><td>축</td><td>진</td><td>오</td><td>인</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 생일에 병오가 양차살을 이루고 외삼촌이 한 분도 없는 고독한 사주다. 외삼촌 한 외숙이 고독 또는 쇠잔하다.</p>
+
+    <p class="saju-label">2의 나</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>계</td><td>무</td><td>계</td><td>계</td></tr>
+        <tr><td>해</td><td>자</td><td>해</td><td>해</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 생시에 계해가 음차살을 이루어 시남이 고독 또는 쇠잔한 사주이다.</p>
+  </div>
+
+  <div class="experience">
+    <p class="indent">
+      음양차살의 십이에서 남은 삼일에 외에서 자매라도 외숙·처남등이 고독한 사주이다. 기묘에서 병신 사이 차살이 들어 생하면 외삼촌이 고독하다 하나 처남은 쇠잔하였다.
+    </p>
+  </div>
+</section>
+
+<!-- 一二、조모 또는 장모 두분 모셔 본다 -->
+<section class="page" id="topic-12">
+  <h2 class="topic-title">一二、조모 또는 장모 두분 모셔 본다</h2>
+
+  <ol class="condition-list">
+    <li>1. 상관·식신을 다봉한 자</li>
+  </ol>
+
+  <div class="reasoning">
+    <p class="indent">
+      상관·식신은 편재 부친의 인수 어머니로 조모가 되는 것이요, 또 처 정재의 인수 어머니로서 장모가 되는 것이다. 따라서 상관이면 정조모 편장모가 되고, 그리고 또 정조모 편장모가 모두 있게 되는 것이다. 또 일지 상관은 내궁의 처모가 합하는 것이요, 또 상관·식신이 장모가 되므로 삼위 일체로 합하는 상이요, 또 일지 상관은 내궁으로 장모가 합하는 것이다.
+    </p>
+  </div>
+
+  <div class="example-section">
+    <p class="saju-label">가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>신</td><td>경</td><td>병</td><td>을</td></tr>
+        <tr><td>인</td><td>오</td><td>오</td><td>미</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 기사상시 을미에 상관이 다봉하여 이복 조모를 두 분 이상 모시고 있었다. 중정목 상관인 기사를 시상에서 다봉했으므로 재혼하여 입양하여 그의 조모를 두 분 모셨다.</p>
+
+    <p class="saju-label">나</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>갑</td><td>을</td><td>을</td><td>갑</td></tr>
+        <tr><td>인</td><td>미</td><td>유</td><td>술</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 을일생에 월지 해중 중 갑목이 있어 사중인수이며, 상관이 다봉하므로 본처 장모 외에 재혼한 장모를 모셔본 사주이다.</p>
+
+    <p class="saju-label">다</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>을</td><td>병</td><td>갑</td><td>계</td></tr>
+        <tr><td>미</td><td>인</td><td>술</td><td>축</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 병일생의 상관 기토 및 식신 무토가 다봉하여 장모를 두 분 모셔본다.</p>
+  </div>
+</section>
+
+<!-- 一三、장모 봉양할 일이 있어 모신다（여명기준） -->
+<section class="page" id="topic-13">
+  <h2 class="topic-title">一三、장모 봉양할 일이 있어 모신다（여명기준）</h2>
+
+  <p>총칭함이요, 또 봉양한다는 것은 삼합 또는 육합 외에 준삼합 준방합 동합의 합하여 도화인수가 되므로 면에서는 동일함이고 생활비를 대주어도 봉양한다.</p>
+
+  <div class="example-section">
+    <p class="saju-label">1의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>갑</td><td>무</td><td>정</td><td>경</td></tr>
+        <tr><td>인</td><td>자</td><td>미</td><td>오</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 정일생 처 유금이 일지 중궁 경금을 합하고 처 장모 봉양이다. 인미 처 장모 비궁이요, 합하고 있어 처의 장모 봉양을 하는 상으로 처 장모를 봉양한다.</p>
+
+    <p class="saju-label">2의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>정</td><td>신</td><td>경</td><td>무</td></tr>
+        <tr><td>미</td><td>해</td><td>자</td><td>술</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 사수 상관이 장모가 일지 해중 갑목 장모와 합하고 일지 진으로 동합하여 처 장모 봉양한다.</p>
+
+    <p class="saju-label">3의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>갑</td><td>갑</td><td>병</td><td>기</td></tr>
+        <tr><td>신</td><td>인</td><td>인</td><td>사</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 지에 임하여 도화인수가 되어 갑일대 을미일생에 소실장모 봉양한다.</p>
+  </div>
+
+  <div class="reference">
+    <p class="small-note">〈연구〉</p>
+    <p class="indent">
+      정미일좌 식신이 직접 재성을 만나지 못하여 함의 그 직접에 합하면 처 소실장모 봉양 시 일대의 편인수가 도화인수의 시 재성을 유도한다.
+    </p>
+  </div>
+</section>
+
+<!-- 一四、이복형제（자매포합） -->
+<section class="page" id="topic-14">
+  <h2 class="topic-title">一四、이복형제（자매포합）</h2>
+
+  <ol class="condition-list">
+    <li>1. 비견·비겁（유겁이라고도 함）이 건겁이 달충 또는 봉충한 자</li>
+    <li>2. 일지와 비겁이 합화하여 비겁이 되는 자</li>
+  </ol>
+
+  <div class="reasoning">
+    <p class="indent">
+      비견·비겁（유겁）은 형제자매인데 비견·비겁이 합하는 것은 비견 형제성이 다른 별궁에 있고 또 타주에 비견이 합하는 것은 형제간이 동시에 편모가 있다고도 되며 생월이나 비견·비겁과 합하면 형제의 편모의 생자의 되므로 또 형제가 되는 것이다. 어머니와 비겁에 합궁 시는 형제성이 다른 형제간에 합하는 리치가 되기 때문이다. 그리고 비견·비겁을 합하며 갑을목 이는 형제의 편모의 생자와 합하는 것이므로 여기에 비견·비겁은 동부 형제의 정 형제와 합하는 것이므로 지만 여기에서는 이복형제가 있다는 것이다.
+    </p>
+  </div>
+
+  <div class="example-section">
+    <p class="saju-label">1의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>계</td><td></td><td></td><td></td></tr>
+        <tr><td>축</td><td></td><td></td><td></td></tr>
+      </table>
+    </div>
+    <p>이 사주는 일지 술중 정화 비견도 맡하는 것이다. 이복형제의 비견이 합궁하여 이복형제가 있다.</p>
+
+    <p class="saju-label">1의 나</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>신</td><td></td><td></td><td></td></tr>
+        <tr><td>사</td><td></td><td></td><td></td></tr>
+      </table>
+    </div>
+    <p>이 사주는 일지 인중 갑목 비견과 합하는 것으로 이복형제 있다.</p>
+  </div>
+
+  <div class="reference">
+    <p class="small-note">〈참고〉</p>
+    <p class="indent">
+      육십갑자중 타주의 상관 식신을 많은자 유무를 찾아 그의 추리와 식당을 기록하여 본 것으로 원유는 아닌가 참고로 수 많은 경험에서 기술한 것인데 그의 이복형제에 관련시킨 배다.
+    </p>
+  </div>
+</section>
+
+<!-- 一五、고부간에 갈등 있다 -->
+<section class="page" id="topic-15">
+  <h2 class="topic-title">一五、고부간에 갈등 있다</h2>
+
+  <ol class="condition-list">
+    <li>1. 인수에 재다 또는 재에 인수왕한 자</li>
+    <li>2. 일월지간에 충노 또는 주중재인이 쟁투한 자</li>
+  </ol>
+
+  <div class="reasoning">
+    <p class="indent">
+      인수은 인수와 재다 또는 재에 인수왕하면 바로 모친과 처 사이에 갈등이 생기는 것이요. 일월지간에 충노가 되면 재인이 상호작용하여 모친인수와 재가（처）에게 갈등이 생기는 것이다. 사주에 인수와 재가 적대하고 인수가 왕하면 모친이 나를 더 살갑게 할수록 처가 원한을 갖는 것이요, 또 주중에 중간결합 없이 재인이 쟁투하면 고부간에 갈등이 집중하면 삼항에서 말한 바와 같이 모친과 처가 쟁투하는 형상이 된다.
+    </p>
+  </div>
+
+  <div class="example-section">
+    <p class="saju-label">1의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>계</td><td>계</td><td>신</td><td>계</td></tr>
+        <tr><td>사</td><td>미</td><td>미</td><td>인</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 사중재인이 왕하고 인수와 처가 쟁투하여 고부간의 갈등이 심한 사주다. 오합이다. 일오 상이므로 처가 불목하고 모친 역시 처가 종지 않다고 자살하였다.</p>
+
+    <p class="saju-label">2의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>무</td><td>계</td><td>신</td><td>을</td></tr>
+        <tr><td>자</td><td>해</td><td>해</td><td>해</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 일월이 자오로 충하였고 또다시 재왕인쇠로 고부간의 갈등이 있는 사주다.</p>
+  </div>
+
+  <div class="experience">
+    <p class="indent">
+      이상에서 보는 바와 같이 일의 가와 이의 가가 모두 재왕인쇠로써 그 처가 승하여 자기의 승패에 반대로 모두 처가 자살하고 발했다. 이와 같이 처가 자살하고 또 처가 형사 하는 것이요 중하하여 태과불급의 이치로 강한 자가 도리어 형을 못이겨 사하는 것이다.
+    </p>
+  </div>
+</section>
+
+<!-- 一六、시어머니간에 갈등 있다（여명기준） -->
+<section class="page" id="topic-16">
+  <h2 class="topic-title">一六、시어머니간에 갈등 있고 또 있다（여명기준）</h2>
+
+  <ol class="condition-list">
+    <li>1. 비견·비겁이 왕한 자</li>
+    <li>2. 인수 태왕에 비견자</li>
+    <li>3. 재다봉에 생관살자</li>
+  </ol>
+
+  <div class="reasoning">
+    <p class="indent">
+      비견·비겁이 왕하면 나를 돕는 것이요, 또 비겁이 재를 뺏는 형상이요 또 재가 다봉하여 경우에 형상이 있고 재는 시어모로 되는 것이니 재는 시어모가 되는 것이요. 재가 왕하면 나를 보금하고 관살은 남편이요 또 남편을 관하여 되는데 재가 왕하면 시어머니가 관살하는 것이니 시어머니가 남편으로 해서 나를 괴롭히는 상이 되는 것이요 또 주중에 재인이 쟁투한 자도 시어머니와 갈등하는 것이다.
+    </p>
+  </div>
+
+  <div class="example-section">
+    <p class="saju-label">1의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>계</td><td>무</td><td>병</td><td>계</td></tr>
+        <tr><td>해</td><td>오</td><td>인</td><td>해</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 을사상 달하여 시상 병화의 비견이 처에 다봉인수가 처가 흉사하여 다시 재왕인쇠 자살하였다. 무명에 주었다.</p>
+  </div>
+</section>
+
+<!-- 一七、해외출입 한다 -->
+<section class="page" id="topic-17">
+  <h2 class="topic-title">一七、해외출입 한다</h2>
+
+  <ol class="condition-list">
+    <li>1. 사주중에 역마 달봉한 자</li>
+    <li>2. 해자년월 갑을일생</li>
+    <li>3. 해자년월 갑을일생은 역마 달봉한 자</li>
+  </ol>
+
+  <div class="reasoning">
+    <p class="indent">
+      역마는 지살이의 해외여행이요 교통이라 하게 되므로 하는 것을 의미하는 것이요 또 달하면 땅을 밟는 것을 의미하며 현대화하면 해외로 해석함이 됩니다. 오늘날의 역마 즉 정거장 또는 비행장에 해당하며 교통을 뜻하므로써 또 해양에도 해당이 된다고 하겠다. 임은 만경창파, 계일은 수국체로써 해양에 해당된다고 자유로이 해외에 진출 입국하게 된다면 해외출입이 있다는 것이다.
+    </p>
+  </div>
+
+  <div class="example-section">
+    <p class="saju-label">1의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>임</td><td>갑</td><td>경</td><td>계</td></tr>
+        <tr><td>신</td><td>인</td><td>술</td><td>유</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 인생으로서 인이 지살이며 역마를 놓있다.</p>
+
+    <p class="saju-label">2의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>정</td><td>병</td><td>계</td><td>기</td></tr>
+        <tr><td>사</td><td>오</td><td>유</td><td>해</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 축생에 사가 역마인데 사가 해외출입하였다.</p>
+
+    <p class="saju-label">3의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>계</td><td>갑</td><td>경</td><td>임</td></tr>
+        <tr><td>유</td><td>인</td><td>신</td><td>진</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 인사해자중 이자이상 놓았다.</p>
+  </div>
+
+  <div class="experience">
+    <p class="indent">
+      일원래 십이신살은 생년을 기준하나 생일로 다봉지살하면 해외출입한 사주다. 그리고 또 사주에서 인사해자를 합하여 자 이자이상의 해당하며 해외출입이다.
+    </p>
+  </div>
+</section>
+
+<!-- 一八、노상 횡사 있다 -->
+<section class="page" id="topic-18">
+  <h2 class="topic-title">一八、노상 횡사 있다</h2>
+
+  <ol class="condition-list">
+    <li>1. 역마 또는 지살이 일지에 형한 자</li>
+    <li>2. 역마 또는 지살로 상관 태왕을 이루는 자</li>
+    <li>3. 역마 또는 지살이 일지에 형 교통사고대표을 이루는 자</li>
+    <li>4. 역마지 지살이 상관 태왕은 역시 교통사고에 해당 자</li>
+  </ol>
+
+  <div class="reasoning">
+    <p class="indent">
+      역마는 해외여행이요 교통이며 형은 병이다 라하게 되므로 교통사고로 인하여 상한다. 또 지살은 답지 땅을 밟는 것이요 또 교통이요 형은 강자를 충한하여 역마는 지살에 교통사고를 이루어 방지하는데 도움이 될 것이며, 교통사고로 인한 상해를 상관 태왕은 역시 교통사고로 또 해석한다. 또 지살은 여행 교통이므로 반격을 받는 것이요 또 교통사고로 심혈을 끊시키는 것으로 역마도는 기혈을 짜내는 것이므로 역마 지살로 교통사고대표를 이루는 자이다.
+    </p>
+  </div>
+
+  <div class="example-section">
+    <p class="saju-label">1의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>계</td><td>신</td><td>임</td><td>신</td></tr>
+        <tr><td>축</td><td>해</td><td>자</td><td>자</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 계사일 갑인시에 출생한 역마를 놓고 교통사고로 노상에서 횡사 하였다. 로상에서 횡석에 의하여 죽었다.</p>
+
+    <p class="saju-label">2의 나</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>갑</td><td>신</td><td>정</td><td>갑</td></tr>
+        <tr><td>인</td><td>사</td><td>축</td><td>인</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 신일생인이 역마와 지살이 일지 교통사고에 임하여 노상 횡사가 있다.</p>
+  </div>
+</section>
+
+<!-- 一九、화상（탕화살）에 해당하거나 또는 교통사고 있다 -->
+<section class="page" id="topic-19">
+  <h2 class="topic-title">一九、화상에 해당하며 예로서 교통사고 있다</h2>
+
+  <ol class="condition-list">
+    <li>1. 인일생인이 달사신한 자</li>
+    <li>2. 오·축일생인이 달사한 자</li>
+    <li>3. 축일생인이 달오미성한 자</li>
+    <li>4. 진·자일생인이 달오미한 자</li>
+    <li>5. 술자일생인이 달오한 자</li>
+    <li>6. 무·자일생인이 달인인한 자</li>
+  </ol>
+
+  <div class="reasoning">
+    <p class="indent">
+      연인비 인일생인이 탕화살이며 축일생인이 역시 탕화살이다. 각각 다시 달오미성하면 삼형살로서 피화가 비참하이요 또 다봉인은 탕화살이 태왕하는 모 반각살이므이 이살이요 본체정되면 대등하여 비참하며 정재성으로 탕화살이 태왕하는 것은 흉살이 있는 자를 분명히 나타낸 것으로 큰 흠이 있게되어 들어나는 것이다.
+    </p>
+  </div>
+
+  <div class="example-section">
+    <p class="saju-label">1의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>정</td><td>갑</td><td>병</td><td>갑</td></tr>
+        <tr><td>묘</td><td>자</td><td>오</td><td>인</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 인일 탕화살로서 불에 데여 큰 흠이 있다.</p>
+
+    <p class="saju-label">2의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>갑</td><td>갑</td><td>병</td><td>갑</td></tr>
+        <tr><td>자</td><td>인</td><td>오</td><td>인</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 월지 신이 달오미 충형살에 해당하여 양겁물 먹어본 큰 흠이 있는 사주다.</p>
+  </div>
+
+  <div class="experience">
+    <p class="indent">
+      점·사마귀가 없거나 아니면 흉터 열병등으로 인한 질병이 있는 사람은 편 짧은 것을 많이 보았다.
+    </p>
+  </div>
+</section>
+
+<!-- 二〇、감금 당하여 본다 -->
+<section class="page" id="topic-20">
+  <h2 class="topic-title">二〇、감금 당하여 본다</h2>
+
+  <ol class="condition-list">
+    <li>1. 일지 달나망살한 자</li>
+    <li>2. 주달옥살한 자（진술은 기해）</li>
+    <li>3. 기해일 달주살한 자</li>
+    <li>4. 기해일생은 달기해한 자</li>
+  </ol>
+
+  <div class="reasoning">
+    <p class="indent">
+      생일은 기신이요 형살은 무례·무은·지세를 지껄이며 장성을 충하는 자의 기의 제재를 받아야 된다. 연인대 장성이 군하여 삼사통회라는 글에 일 장성가하 장제충군인이라 하여 군의 요충에 충물을 발함인비 중앙 경하는 곳에 주 즉 군체포복이 낙죄되고 구속되는 상이 되며 성변을 둘러하는 것이며 감금하며 암에도 도난 이라지 않는 것이요 진이 기해자중 일자만 만나면 해당 경찰관·형무관·헌병·사법관 기타의 특무기관·수사 기관에 중사하는 등은 자 모두 감금 남자도는 이상의 살사한면 무방하다.
+    </p>
+  </div>
+
+  <div class="example-section">
+    <p class="saju-label">1의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>계</td><td>을</td><td>기</td><td>임</td></tr>
+        <tr><td>축</td><td>묘</td><td>유</td><td>진</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 자일생인이 일지 묘와 육이오 때 와 자 묘로 상형하여 감금된 사주이다.</p>
+
+    <p class="saju-label">2의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>무</td><td>신</td><td>병</td><td>갑</td></tr>
+        <tr><td>술</td><td>진</td><td>오</td><td>인</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 옥살이 되어 감금한 사주이다. 무술과 합화하여 사주한번 감금하여 본 사주이다.</p>
+
+    <p class="saju-label">3의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>임</td><td>정</td><td>갑</td><td>계</td></tr>
+        <tr><td>술</td><td>묘</td><td>인</td><td>미</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 진일생이 달진 옥살되어 감금한번 감금하여 본 사주다.</p>
+  </div>
+</section>
+
+<!-- 二一、수족에 이상 있다 -->
+<section class="page" id="topic-21">
+  <h2 class="topic-title">二一、수족에 이상 있다</h2>
+
+  <p>급각살은 꿸 다리</p>
+
+  <ol class="condition-list">
+    <li>1. 일 또는 시에 달삼전의 술오일생자（지강）</li>
+    <li>2. 일 또는 시에 달삼전의 술오일생자</li>
+    <li>3. 년월에 진유의 술오일 삼전자</li>
+    <li>4. 술일 삼전이란 년월일을 달한다</li>
+  </ol>
+
+  <div class="reasoning">
+    <p class="indent">
+      급각살은 꿸 다리이니 이 살을 달한다 하는 것은 수족에 이상이 있는 것이요（살의 정성원리는 미상） 또는 목 화일주 심경기약 또는 심장기약 되는 상이다.
+    </p>
+  </div>
+
+  <div class="example-section">
+    <p class="saju-label">1의 나</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>기</td><td>기</td><td>정</td><td>을</td></tr>
+        <tr><td>묘</td><td>묘</td><td>사</td><td>해</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 기일생인이（지강） 기묘일로 해당되어 다리를 걸고 다는 사주다.</p>
+
+    <p class="saju-label">2의 나</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>계</td><td>신</td><td>병</td><td>병</td></tr>
+        <tr><td>묘</td><td>유</td><td>진</td><td>진</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 월일이 달삼전 이루며 두다리가 불구이다. 다리를 절어 다니는 사주이다.</p>
+  </div>
+</section>
+
+<!-- 二二、정신 이상 있어 본다 -->
+<section class="page" id="topic-22">
+  <h2 class="topic-title">二二、정신 이상 있어 본다</h2>
+
+  <p>귀문관살자</p>
+
+  <ol class="condition-list">
+    <li>1. 사주에 귀문관살자</li>
+    <li>2. 목화일주 심경기약자</li>
+  </ol>
+
+  <div class="reasoning">
+    <p class="indent">
+      귀문관살은 정신이상 되는 살이요（살의 정성원리는 미상） 또는 목·화일주는 간경기약 또는 심장기약으로서 심경기약 또는 심장기약 되는 상이며 정신이 예민하여 사리에 밝으며 총명하게 되나 매우 정신이 민감하여 정신병이 있다 하는 것이다.
+    </p>
+  </div>
+
+  <div class="example-section">
+    <p class="saju-label">가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>무</td><td>임</td><td>을</td><td>무</td></tr>
+        <tr><td>신</td><td>인</td><td>묘</td><td>인</td></tr>
+      </table>
+    </div>
+    <p>삼형을 놓아 다리를 절는 사주다.</p>
+  </div>
+
+  <div class="experience">
+    <p class="indent">
+      이 귀문관살을 놓은자는 목은 간경기약이요 또는 심장기약 되는 상이요 정신이 예민하여 총명하게 되나 매우 정신이 민감하다 하는 것이다.
+    </p>
+  </div>
+</section>
+
+<!-- 二二、정신 이상 - 참고 및 실례 보충 -->
+<section class="page" id="topic-22-cont">
+  <h3>〈참고〉</h3>
+  <p>이 사주는 정화일생이 심취하여 정신이상·정상 알아본 사주다.</p>
+
+  <p class="saju-label">1의 나</p>
+  <div class="saju-chart">
+    <table>
+      <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+      <tr><td>갑</td><td>정</td><td>정</td><td>무</td></tr>
+      <tr><td>인</td><td>묘</td><td>묘</td><td>신</td></tr>
+    </table>
+  </div>
+  <p>이 사주는 정화일생이 갑취하여 정신이상 알아본 사주다. 사주에 귀문관살을 놓아 정신이상 알아본 네 사주다.</p>
+
+  <p class="saju-label">2의 나</p>
+  <div class="saju-chart">
+    <table>
+      <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+      <tr><td>을</td><td>을</td><td>병</td><td>계</td></tr>
+      <tr><td>해</td><td>묘</td><td>오</td><td>유</td></tr>
+    </table>
+  </div>
+  <p>이 사주는 을일생이 오월사화로 정신이상 알아본 사주다.</p>
+
+  <p><strong>참고.</strong></p>
+  <p>가. 이 사주는 기일생인이 외외경신이상을 합하여 경험상 기일생 허약한자는도 정신이상자에도 연고 경험한 결과 한의학에서 정신이상한 결과이다.</p>
+  <p>나. 이 사주를 보면 사무궁 금선서 편운이를 보면（경험상 열 사람중 일곱 여덟은 만나보고 증험을 놓고） 수치 경험한 결과 한의학에서 정신이상을 다루기로 하는 것이 과학적으로 과 통계 경험상 자기는 통계하고 있는데（이것을 십분의 팔구십계산） 사항을 가지고 실례 경험 결과 한방에서 경험한 결과이다.</p>
+
+  <p><strong>참고 나.</strong></p>
+  <p>이 사주는 기일생이 신금이상에（정신경약이라）착란한 사주이다. 이 사주를 보면 을해시에 기묘일에 정사월에 을해년으로（이르면 안되는 것이요）이것이 대단히 착란한 것이다.</p>
+  <p>기일생의 경우（을기일로 착란하는 것은 십분의 공계를 해야 된다고 한다）이것은 또한 일기（원래로부터 저는 계정을 달한 것이요）만물이 이사 논하여（을기 의기）이것을 가지고 기사 달한 것이다. 이 새로운 기획을 가지고 과도기 결과를 논한다（경우에 또는 달음）.</p>
+</section>
+
+<!-- 二三、눈·목에 이상 있다 -->
+<section class="page" id="topic-23">
+  <h2 class="topic-title">二三、눈·목에 이상 있다</h2>
+  <p>을해</p>
+
+  <ol class="condition-list">
+    <li>1. 추월말 병신술일생이 다봉재달재살자</li>
+    <li>2. 병인일 병자일 생이 을묘일 재살봉상관자</li>
+    <li>3. 해자월 무술일생이 다봉재달재살자</li>
+    <li>4. 생년 해자월 생이 다봉재달자</li>
+  </ol>
+
+  <h3>〈해설〉</h3>
+  <p>을묘일 을해일 갑진일 갑자일 생인이 재살봉상관이 되면, 병인일 병술일생이 시간에도（가）또다시 사주중에서 재살이 왕한 자는 외，또는 병신일 사주중에서 재살이 왕한 자외，사주중에서 단 하나의 후운을 만나거나 또는 궁으로（금수의 한금） 사주중의 관하여 본다.</p>
+
+  <div class="reasoning">
+    <h3>○ 추리</h3>
+    <p class="indent">
+      1. 추월은 중추이니서월은 지지가 왕하고 또는 사시에 병오일수는（또는 정사일생이 시간에 생하고）사주중 사주 지지에서 재살과（다시） 사주 중에서 화국을 이루어서 금국으로 하면 목일주는 약하고 또는 해당하는 것으로서 간경이요. 비경열요, 약시 시월은 금자하여 여시 화왕 목기하여 나타나는 것이다.
+    </p>
+    <p class="indent">
+      2. 병인 병자 병신생은 지지장에 재살하여 자연적으로 일주 표약하게 되고. 일주 표약하면 간경이요 또는 비경이요（다시 생화를 함）또는 비경이 약화 되어서 신경 쇠약 되는 것이다.
+    </p>
+    <p class="indent">
+      3. 해자월 정기월생이 다봉무토재살·갑목재살이요（또는 간관심자）또는 감금태왕자（또는） 재살왕자라 하며 재관살왕자라 하는 상이다.
+    </p>
+    <p class="indent">
+      4. 비위지모고로 비위가 약하면 목을 잘하여 되지 못하며 또는 비위가 약하면 간경에 근（木은 간경의） 대왕하면 일주가 되는 뿌리가 되고 간화（이 상이면 목인즉） 비경 일주가（재살을 놓고서） 건조하여지는 것이요（토류 일주생） 또는 약시 하며 이것 또한 뼈 절을 봐서 피하여 안되는（비경 또는 간경） 이에 빠질（체질 안되는） 되어서 양한 비위가 약한자의（이것이 또한） 사주를 보고서 간경이 약하다 하는 것이다.
+    </p>
+  </div>
+
+  <div class="example-section">
+    <h3>〈연구〉</h3>
+    <p>하며 안경을 쓰거나 이상을 사주에 맞추어서 통계로 발견되지 않은 것인데，화성은 소장이요 또는 소장은 심장이므로，병화는 눈으로 볼 수 있는 것이니，보인이 이하 눈인 것이요 정화는 정신인 이것이다.</p>
+
+    <p class="saju-label">1의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>무</td><td>병</td><td>병</td><td>정</td></tr>
+        <tr><td>진</td><td>자</td><td>인</td><td>묘</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 병자일 비록 년상에 두 번째로，병일 시간에 모두 지지 화국을 넣어서 눈맹인이 된 사주다.</p>
+
+    <p class="saju-label">특1의 나</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>무</td><td>병</td><td>임</td><td>신</td></tr>
+        <tr><td>진</td><td>인</td><td>자</td><td>진</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 병인일로 사주중에 수왕하고 무근하여 심하여 눈맹인이 된 사주다.</p>
+
+    <p class="saju-label">특2의 나</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>을</td><td>정</td><td>병</td><td>무</td></tr>
+        <tr><td>해</td><td>사</td><td>자</td><td>진</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 사사에서 병화화수하고 지지 사화가 무근하여 눈맹인이 된 사주다.</p>
+
+    <p class="saju-label">2의 을사</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>신</td><td>을</td><td>을</td><td>갑</td></tr>
+        <tr><td>묘</td><td>해</td><td>미</td><td>술</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 을해일 지지목생화하고 을미월로 제해 하여 안맹인이 된 사주다.</p>
+
+    <p class="saju-label">3의 을축</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>신</td><td>을</td><td>신</td><td>기</td></tr>
+        <tr><td>축</td><td>해</td><td>묘</td><td>해</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 지지 해묘합목하여 일주 해수 준삼합 사화로 안맹인이 된 사주다.</p>
+
+    <p class="saju-label">4의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>을</td><td>신</td><td>정</td><td>신</td></tr>
+        <tr><td>해</td><td>사</td><td>해</td><td>해</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 사주에 정사 눈맹인이 있었다.</p>
+
+    <p class="saju-label">4의 나</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>기</td><td>을</td><td>정</td><td>을</td></tr>
+        <tr><td>유</td><td>해</td><td>묘</td><td>묘</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 고 사주에는 을 사주가 되어 눈맹인이 되는 사주다.</p>
+  </div>
+
+  <div class="reference">
+    <h3>〈참고〉</h3>
+    <p>사주가 구성에（또는 아니고도）연월일이 사주에 지지에서 다봉화（사오화 또는 사주）되는 것은 사주에서 월시에（특히）년지와 지지에서 이루어진다. 사주는 눈맹인 아니지만 현시 안경을 달고 다니는 것을 발견하고 있다.</p>
+    <p><strong>특1</strong>의 가.</p>
+    <p>이 사주 역시 병화가 다봉하여 눈맹인이 된 사주다.</p>
+  </div>
+</section>
+
+<!-- 二四、수액 -->
+<section class="page" id="topic-24">
+  <h2 class="topic-title">二四、수액</h2>
+  <p>수액이 있다</p>
+
+  <ol class="condition-list">
+    <li>1. 일시에 수성왕왕자자생인이 금수도는 재살이 태왕한 자</li>
+    <li>2. 갑을일생인이 수성이 왕하여 금수로 하면 재살이 태왕한 자</li>
+    <li>3. 무기일생인이 금수도는 재살이 태왕한 자</li>
+  </ol>
+
+  <div class="reasoning">
+    <h3>○ 추리</h3>
+    <p class="indent">
+      낙정관살이라 함은 목이요 수이요, 수성이나 목성이 있는 재살이 태왕한 자（이 살의 정성원리는 미상）또는 물에서 빠져서 물놀이를 당하거나 강물에（몰에서）빠져서 사고를 당하는 것이요 또는 재살과（이 살의 구성원리는 미상） 또한 수왕으로 하면 표류（목류수성이나 미상）또는 수다즉목
+    </p>
+    <p class="indent">표하는 상이 되는 것이요,</p>
+    <p class="indent">낙정관살이라 함은 갑을일생은 목이요, 수이며, 수를 보면 금수도는 재살이다. 또는 왕에 재차 낙정관살의 해설（바로 이것은 본문에서 기록하고 있는 것으로서）이것은 분명히 이해하기 어려운 것이다. 고로 리해하기 위해서는（상류）추리를 사주로 맞추어 보아야 하는 것이다.</p>
+  </div>
+
+  <div class="example-section">
+    <h3>○ 실례</h3>
+    <p>전에 낙정관살의 해설을 바로잡기 위해（기록하여 있는것）은 분명히 사주 경험자의 기록인데 이것은 이해하기 어려운 것이다.</p>
+
+    <p class="saju-label">1의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>정</td><td>임</td><td>경</td><td>갑</td></tr>
+        <tr><td>묘</td><td>인</td><td>자</td><td>신</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 임인일로 재살이 월일시에 낙정관살이 있으니 금수가 투출되어 있으요 년월이 수국을 이루고 재살왕한 경우에 첩수 가지고 살아 나가다가 투신 자살한 사주다.</p>
+
+    <p class="saju-label">2의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>신</td><td>임</td><td>을</td><td>임</td></tr>
+        <tr><td>해</td><td>인</td><td>해</td><td>진</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 관살이 월시 마봉하고 또 사주에 수국으로서 거들이 하여 일주가 구사에 몰려서 사주에 가지고 투신자살 하였다.</p>
+
+    <p class="saju-label">3의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>임</td><td>임</td><td>기</td><td>임</td></tr>
+        <tr><td>인</td><td>인</td><td>미</td><td>신</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 출생하고 삼년 수재에（미래 부근의 별사 근처에 있은 것으로써）은총 복에 장생하다가 위장병으로 투신 자살한 사주다.</p>
+  </div>
+
+  <div class="reference">
+    <h3>〈연구〉</h3>
+    <p>동사주의 사주는（이삼항 안맹인이 된 자의 사주와 같으나）수사 실례 2의 가의 사주에서 같은 사주다.（삼번의） 사주는 사항에 사주에（기록되어 있으니）우리 사주학에서 낙정의 해설을 기록하고 있는 것은 분명히 명리의 기록인데（이것은 분명히 이해하기 어려운 것이며） 사주 계에서는 한 번은 재론하여야 하는 과제인 것이다.</p>
+    <p>경험으로 보면 사주에 재살이 태왕하고 사주 수가 다봉하면（또는 금수 태왕하면）사주에 재살이 왕하고 사주 전에서（또한 수가 태왕하면） 지지에서 금수가 왕하면 물에 빠질（익사하여） 위험이 높은 것이다.</p>
+    <p>본명에 재가 되면（낙정관살이라 하면은） 위령이 두렵지 않다 하며 또는 재가 사주 빈궁 자이다.（이라면 나시 것이 나리라） 그 사주 빈궁 하며 재살 왕하고 또한 재가 사궁에（또는 공히 이라면 재 사궁이면） 절경이라 하는 것이요 공궁에는（독궁에） 재살왕하면 기하고（재화한 것에 해하며）.</p>
+  </div>
+</section>
+
+<!-- 二五、치질 -->
+<section class="page" id="topic-25">
+  <h2 class="topic-title">二五、치질</h2>
+  <p>인묘사오미월 생인이 신사묘 다봉목화 왕한 자</p>
+
+  <ol class="condition-list">
+    <li>1. 인묘사오미월생인이 다봉목화가 왕한 자</li>
+    <li>2. 경신묘사오미 출생하고 중에 다봉화토한 자</li>
+    <li>3. 경은 금궁이요 대장인데（이 금가 화왕한 경우） 혈액이 왕하여지는 것이 금궁이면 화왕 하게 되며 치질병이 되는 상이다.</li>
+  </ol>
+
+  <div class="reasoning">
+    <h3>○ 추리</h3>
+    <p class="indent">
+      금궁이 화왕하여지면 치질이 되는데, 이유는 원래 금은 대장이고, 화왕하면 금이 약해지므로（또는 상화가 되어서）대장의 혈관이 약해지고（결국에는 치질이 되는 것） 또한 혈액순환이 안 되어서 치질이 되는 것이요, 원인은（결국 간경의 혈） 남자로서 혈약으로 된 것이요（또는 화왕하면 열이 되어서）치질병으로 된 상이다.
+    </p>
+  </div>
+
+  <div class="example-section">
+    <h3>○ 실례</h3>
+    <p class="saju-label">1의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>무</td><td>갑</td><td>경</td><td>갑</td></tr>
+        <tr><td>인</td><td>인</td><td>오</td><td>인</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 지지 인오하여 목왕하고 또는 목일주로 약화되어 화왕한 상이다. 갑인 해당되어 치질병 환자이다.</p>
+
+    <p class="saju-label">2의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>신</td><td>신</td><td>병</td><td>기</td></tr>
+        <tr><td>묘</td><td>묘</td><td>인</td><td>사</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 지지에 인묘사가 또한 목화가 왕하고 또한 금일주가 약화하여 치질 환자의 사주이다.</p>
+
+    <p class="saju-label">3의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>계</td><td>신</td><td>신</td><td>병</td></tr>
+        <tr><td>해</td><td>묘</td><td>묘</td><td>인</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 신일주가 생하고 시에 화가 있으면서 일지에서 약화하고（간이） 치질환자의 사주이다.</p>
+  </div>
+
+  <div class="reference">
+    <h3>〈참고〉</h3>
+    <p>추명가결 팔자 중에 점명하면 화격은 종재격 등에 이루어 사주는 박사 학장 총장의（네 사주는 여기에 해당 안되는 것이지만）추명가결 팔자에 기록하여 사시에 있다.</p>
+  </div>
+</section>
+
+<!-- 二六、비위가 -->
+<section class="page" id="topic-26">
+  <h2 class="topic-title">二六、비위가</h2>
+  <p>정사</p>
+
+  <ol class="condition-list">
+    <li>1. 무기일생이 다봉금 수 약한 자</li>
+    <li>2. 무기일생이가 다봉재살 약한 자</li>
+    <li>3. 인오술 사오미월에 출생하고 다봉화토한 자</li>
+  </ol>
+
+  <div class="reasoning">
+    <h3>○ 추리</h3>
+    <p class="indent">
+      무기일은 중앙토요（오장으로는 비위에 속하고 오미는） 토생금으로 비위가 약해지고, 토류해지는（상이요. 그러나） 비위는 소약하는 만큼 비위에서 비위가 감하며 자기의 에너지를 발（달하지 못하면 비위가 곧 비위하고, 이것이면） 자극이 없으면（다시） 비위도 약하다고 간정하게 되는 것이다.
+    </p>
+    <p class="indent">
+      이것이 너무도 화왕하면 또는 비위가（어처구니없는） 것이 될 수도 있고（또는 비위가 더럽게 된다） 너무나 생화되면 발달하고 다봉화토인즉 비위가 더욱이 되면（비위도 이상하게 되는 상이라고）판정하게 되는 것이다.
+    </p>
+  </div>
+
+  <div class="example-section">
+    <h3>○ 실례</h3>
+    <p class="saju-label">1의 나</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>을</td><td>기</td><td>신</td><td>갑</td></tr>
+        <tr><td>묘</td><td>묘</td><td>인</td><td>자</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 해월 무술일로 심약하여 위병환자가 되었다. 하며 위병으로 부식하여 다가 부식업을 하는 사주다.</p>
+
+    <p class="saju-label">2의 나</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>신</td><td>을</td><td>기</td><td>을</td></tr>
+        <tr><td>묘</td><td>묘</td><td>묘</td><td>해</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 목왕하여 월간기토의 비위가 심해져서 위병환자인 사주이다.</p>
+  </div>
+
+  <div class="reference">
+    <h3>〈경험〉</h3>
+    <p>이오항에 해당하는 사주는 화왕토로（조열하고 건조한 환경에서）비위가 약하면 위가 비위하고, 소화불량, 위무력증, 위경화, 위하수 등으로（위무력증 환자가 많고） 또 3항의 경우와 같이 위염증, 위산과다증에 해당하며（장위에 해당하는 부분이면 위하수하면） 위통이 있는 위장수술한 환자가 많고, 또한 위만 아닌 것도（소장에 해당하는 것도）있다.</p>
+  </div>
+
+  <div class="example-section">
+    <p class="saju-label">3의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>병</td><td>무</td><td>갑</td><td>정</td></tr>
+        <tr><td>인</td><td>술</td><td>오</td><td>사</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 무술일이 인오사화에 목화태왕하여 토생금에서 조열하면서 토가 약해 금이가 심하여 비위가 심약 비위약한 사주이다.</p>
+  </div>
+
+  <h3>〈상고문헌〉</h3>
+  <p>계선편운 「토허봉목지향에 비위상론이라」</p>
+
+  <div class="example-section">
+    <p class="saju-label">3의 나</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>정</td><td>기</td><td>무</td><td>경</td></tr>
+        <tr><td>사</td><td>사</td><td>인</td><td>인</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 기사일생이 지지에 화왕하여 건조하고 비위 주역으로（위병환자이며）위장에 병이 있어 동하고 수병이 되어서 만달하여서（만달은 소변을 말함）있는 사주이다.</p>
+  </div>
+</section>
+
+<!-- 二七、해소·기침 -->
+<section class="page" id="topic-27">
+  <h2 class="topic-title">二七、해소·기침</h2>
+
+  <ol class="condition-list">
+    <li>1. 인오일 무술일생인이 지지 화왕하여（이 경우 당연히） 화성 월 화성일 로해 일주 갑자가 심취 약화하여 폐기가 되고 혈관이 되면서 그대로 기관이 되어가고 심폐 기능을 약화되어서 또한 재발해지는 증세가 들는다.</li>
+    <li>2. 전기 이오항이 해당하며（또는 이와 같이 갑인이 감해지는 것이면） 또는 신체 또는 수왕하여 목왕이 함하면 갑목 기침 환자는 하는 것이며（또한 기침 환자의 사주）</li>
+    <li>3. 임계일생인이 지지 화왕에 의하면（이와 같이 될 수 있고）또한 사주에 있어서 출하면</li>
+    <li>4. 해자일생인이 다봉화토이면 수왕기약으로 천식 환자가 된다</li>
+  </ol>
+
+  <div class="reasoning">
+    <h3>○ 추리</h3>
+    <p class="indent">
+      화성 월 화성일로써 일주 갑자이 심취（심하게）약화되면 해소·기침이 되는 것이니 화성이 일주가 되는 것이요 또는 심장, 혈관이 되고（또한 기관이 됨）심폐기능을 약화시키고 그리고 장계절에 또한 재대하여지게 되면（즉 추위에） 수화상전하는 상이 되어서 풍한 습이 되어서 기침을 하고, 또한 수목이 왕한자는 풍한으로 인하여 수목이 왕하게 되며（이것이） 지지에서 수국을 이루어서 혈관 수축으로 인하여 또는 약하게 되면서 기침이 되는 것이다.
+    </p>
+  </div>
+
+  <div class="example-section">
+    <h3>○ 실례</h3>
+    <p class="saju-label">1의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>갑</td><td>갑</td><td>기</td><td>병</td></tr>
+        <tr><td>인</td><td>인</td><td>사</td><td>인</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 목화태왕 인오사 인으로 화왕하여 기침이 생하고 시지 화왕 절기에 한자（사오미절에）기침 환자가 되었다.</p>
+
+    <p class="saju-label">1의 나</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>무</td><td>병</td><td>을</td><td>갑</td></tr>
+        <tr><td>인</td><td>오</td><td>사</td><td>인</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 병오일 화왕히 투출하여 화왕하고 년지 목왕으로 기침하고 약금하여 기침 환자의 사주이다.</p>
+
+    <p class="saju-label">2의 나</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>신</td><td>신</td><td>을</td><td>갑</td></tr>
+        <tr><td>해</td><td>오</td><td>해</td><td>오</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 목화태왕 하여 금약으로（시지에서 또한 해수가 왕하면서 약화가 되어서 기침 환자의 사주이다.</p>
+
+    <p class="saju-label">3의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>을</td><td>을</td><td>계</td><td>임</td></tr>
+        <tr><td>해</td><td>축</td><td>해</td><td>자</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 계일생이 년상 출생하고 사주에 수왕하여 에 출생하고 한습으로 인한 기침 환자가 된 사주다.</p>
+
+    <p class="saju-label">4의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>계</td><td>을</td><td>갑</td><td>임</td></tr>
+        <tr><td>해</td><td>해</td><td>자</td><td>자</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 을해일생이 자월에 수태왕하여 한습으로 천식 환자가 된 사주다.</p>
+  </div>
+</section>
+
+<!-- 二八、성병 -->
+<section class="page" id="topic-28">
+  <h2 class="topic-title">二八、성병</h2>
+  <p>다봉화토한 자</p>
+
+  <ol class="condition-list">
+    <li>1. 임계일생이 다봉화토한 자</li>
+    <li>2. 도화봉형칙（또는） 임계일생이 도화봉형칙자</li>
+    <li>3. 낭랑도화 봉단한 자</li>
+  </ol>
+
+  <div class="reasoning">
+    <h3>○ 추리</h3>
+    <p class="indent">
+      임계일생이 다봉화토이면（수화가 상쟁하여） 됨이니（물이 뜨겁게 되면） 혈액에（불이 올라） 흐르면서 또한 화한 것이고, 또한 （토괴） 되어서（이것이 성병이 되는 것이니） 불순환하게 되는 것이요.
+    </p>
+    <p class="indent">
+      그런 것이요 도화봉형은 성병을 통하고 또한（이 성병이 되기도 하는데）음탕방랑 하는 것이요（또한 계간은） 색욕 흥탕이（에 빠지면） 성병이 되기 쉬운 것이고, 그리고 남자 명에 처합하고（여자 명에 남합하면）낭랑도화에 봉단하면（성병） 결핵에 걸리기 쉬운 것이다.
+    </p>
+  </div>
+
+  <div class="example-section">
+    <h3>○ 실례</h3>
+    <p>이상 삼항에 추리하여 보는 것이며，임·질·림·매독·뇨도염·방광염 등 하여 추리하게 되는 것이다.</p>
+
+    <p class="saju-label">1의 나</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>정</td><td>계</td><td>을</td><td>무</td></tr>
+        <tr><td>사</td><td>축</td><td>축</td><td>인</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 정사일생이 기월에 출생하고 임질로 임진하여 림질로 신음하는 사주다.</p>
+
+    <p class="saju-label">2의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>신</td><td>임</td><td>갑</td><td>갑</td></tr>
+        <tr><td>축</td><td>인</td><td>술</td><td>자</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 사주에 지지 형과（사주에 임인일 시지 축과 형이 되어서）또는 토왕하고（이것이면）지지에서 봉형하여 임질로（도화란에 봉형한）사주다.</p>
+
+    <p class="saju-label">2의 나</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>기</td><td>을</td><td>계</td><td>신</td></tr>
+        <tr><td>미</td><td>축</td><td>축</td><td>사</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 사주에 축축미 형이 되어서 임질로 신음하는 사주다.</p>
+
+    <p class="saju-label">3의 나</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>신</td><td>병</td><td>신</td><td>경</td></tr>
+        <tr><td>묘</td><td>자</td><td>유</td><td>인</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 사주에（지지에 형이 되어서 또한 림질로 또는 매독 등으로 고생하다가）살고 있는 사주다.</p>
+  </div>
+</section>
+
+<!-- 二九、누변 -->
+<section class="page" id="topic-29">
+  <h2 class="topic-title">二九、누변</h2>
+  <p>물이 열하면 팽창하고（물이 냉하면） 수축하는 법칙이다.</p>
+
+  <ol class="condition-list">
+    <li>1. 사주에（중간에 전기도 축합하여）물이 평평하여 겨울에 세련하게 되면（온양 형상이） 밤에 방뇨할 때 술을 몇 잔 먹으면（야뇨가 되고） 새벽에 거울에는 오줌이 많을 것을 자주 느끼는（오줌을 쌀 주문이 된 것을）사주에서 보아야 되는 것이다.</li>
+  </ol>
+
+  <div class="reasoning">
+    <h3>○ 추리</h3>
+    <p class="indent">
+      인간 오장 방광은 비뇨기에（달하며 이 장기가）되는 것이요, 지지에서 화국을 이루면 수를 증발시켜 방광 기능을 약화시키고, 또한 사주에 금수냉한이면（이 기관이）수축하여 방광이 되는 것이요, 또한 지지에서 오장 방광에 직접하게 되면（또한 방광을 해당으로 하면） 지지에서 금수를 써서 한랭법칙에（따라서 오줌을 보고 또한 야뇨를 하게 된다）여기에 맞추어 오줌이 세거나 밤중 새벽에（야뇨하게 되면 밤에 또 한 것이다.）
+    </p>
+  </div>
+
+  <div class="example-section">
+    <h3>○ 실례</h3>
+    <p class="saju-label">1의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>신</td><td>경</td><td>계</td><td>신</td></tr>
+        <tr><td>묘</td><td>자</td><td>유</td><td>해</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 경자일로 년월에 금수가 대왕하고 냉한에 의하여（수족 냉하고）오줌이 잦고 밤에도 야뇨하는 사주이다.</p>
+
+    <p class="saju-label">2의 나</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>경</td><td>해</td><td>을</td><td>병</td></tr>
+        <tr><td>자</td><td>자</td><td>미</td><td>신</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 해일생이 시지에서 또한 금수 가세하고 냉한에 의하여 누변한 사주다.</p>
+
+    <p class="saju-label">3의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>병</td><td>병</td><td>무</td><td>경</td></tr>
+        <tr><td>자</td><td>자</td><td>해</td><td>진</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 병정일생인이 월 또는 시간에 출생한 사주로서, 사주 지지에서 해자해 수가 왕하여 냉한으로 인한 누변의 사주이다.</p>
+  </div>
+</section>
+
+<!-- 三〇、기타 일진이 다봉식신상관에 봉형겁자 -->
+<section class="page" id="topic-30">
+  <h2 class="topic-title">三〇、기타 일진이 다봉식신상관에 봉형겁자</h2>
+
+  <ol class="condition-list">
+    <li>1. 병정일은 화이요 심장인데 화가 극히 왕하여 심장이 약해지면서 그렇게 되는 것이다.</li>
+    <li>2. 기타 일진이 다봉식신 상관에（또한 봉형겁하면） 자궁수술, 유방종양,  유증 등도 이것이다.</li>
+  </ol>
+
+  <div class="reasoning">
+    <h3>○ 추리</h3>
+    <p class="indent">
+      상관 식신은 자녀요 또한 자궁이며,（이것이 봉형겁하면）자궁에 해당하고（또한 상관을 놓으면）자궁의 이상이 있고 그리고（봉형하면） 자궁수술을 받게 되고（또한 유방의） 이상이 있어서（유종이） 되는 것이다.（봉형겁이면 유방종양이 될 수 있는 것이다）또한 상관식신이 봉형겁하여 자궁의 파열, 유방 수술 등에도 해당하고（해기인즉） 남기 이하에는 저기공이요 또한（이 저 수의 상관식신에 대한 결과인 것이다）
+    </p>
+  </div>
+
+  <div class="example-section">
+    <h3>○ 실례</h3>
+    <p class="saju-label">1의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>무</td><td>병</td><td>무</td><td>기</td></tr>
+        <tr><td>술</td><td>술</td><td>인</td><td>사</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 병술일 생인이 인지에서 미토 식신봉하고（무토가）봉식신 형겁하여 자궁수술 받은 사주이다.</p>
+
+    <p class="saju-label">2의 나</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>정</td><td>정</td><td>기</td><td>병</td></tr>
+        <tr><td>미</td><td>미</td><td>축</td><td>술</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 정미일로 삼형을（축술미） 놓고서（일전 삼형으로） 상관하고 식신을 봉 형겁하여 뱃속관 성대가 되었다.</p>
+  </div>
+
+  <div class="reference">
+    <h3>〈연구〉</h3>
+    <p>이 문제는 직접 저자 본인의 경험으로 판치한 병서를 통하여, 한의학과 결합된 내용이다. 비록 그것이 한의학과 상관이 있다 하더라도（이것이 사주상으로 해석한 것인데）추리 의학을 하는 데 있어서 무엇보다도 더욱 정밀하게 추리하여야（되는 것이다.） 한의학 또는 의학 연구에도（이것을 고려하여야） 경험에서 발견하여（사주학에서도 이용하여야 될 것이다.）</p>
+    <p>전옥부운 「유아지유유（계찬하여 식신이 유왕하고） 상관이 봉형겁이면 유종의 일이 많다」라</p>
+  </div>
+</section>
+
+<!-- 三一、교원생활 -->
+<section class="page" id="topic-31">
+  <h2 class="topic-title">三一、교원생활</h2>
+
+  <ol class="condition-list">
+    <li>1. 춘하월 갑을일생인이 관중에 인수 투출자</li>
+    <li>2. 춘하월 인수경자</li>
+    <li>3. 삼동월 금수일생</li>
+  </ol>
+
+  <div class="reasoning">
+    <h3>○ 추리</h3>
+    <p class="indent">
+      부지를 제공으로 일주와 같이（사주에서 해당하는 것인데）부지가 되는 것은（추리 3에 해당하는 것이며）살을 놓아 교육가의 사주다.
+    </p>
+  </div>
+
+  <div class="example-section">
+    <h3>○ 실례</h3>
+    <p class="saju-label">1의 나</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>갑</td><td>병</td><td>기</td><td>정</td></tr>
+        <tr><td>자</td><td>인</td><td>묘</td><td>묘</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 병일생이 월지 묘중 갑목 인수가 투출하여 놓아 교육가 사주다.</p>
+
+    <p class="saju-label">2의 나</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>을</td><td>기</td><td>을</td><td>갑</td></tr>
+        <tr><td>축</td><td>인</td><td>묘</td><td>인</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 춘하월 갑을일 인수경으로 교육가가 되었다.</p>
+  </div>
+</section>
+
+<!-- 三二、교육가 -->
+<section class="page" id="topic-32">
+  <h2 class="topic-title">三二、교육가</h2>
+
+  <ol class="condition-list">
+    <li>1. 병인일 무술일생이 춘생 해인묘 출생자</li>
+    <li>2. 사주에 인수가 투출하고 또는（기문이 투출하여）교육가 사주다</li>
+    <li>3. 춘하월 갑을일생에（인수가 있으면 교육가가 된다）</li>
+    <li>4. 유월 정해일 무술일 생인에 사주에서（인수가 투출하면）교육가다</li>
+    <li>5. 서월 병정일생이 계달 인수투출 인수경자</li>
+  </ol>
+
+  <div class="reasoning">
+    <h3>○ 추리</h3>
+    <p class="indent">
+      월건을 제강으로 일주와 같이（관련하여 추리하면） 인수가 사주에서 지문의 또한 투출되면 교육가이라 하는 것은（이것이 제강에서 인수를 제강하는 것이니）일주가 인수경에서（또한 관학이） 해당하는 것으로 교육가 사주이며, 또한（일주가 인수경에서）인수투출이 되면 교육가가 되고 그 내용은 이상과 같이（사주상으로 달하여）4·5 항에 해당하는 것과 이상과 같이 달하는 것은 교육가로서 의미를 나타내는 것이다.
+    </p>
+  </div>
+
+  <div class="example-section">
+    <h3>○ 실례</h3>
+    <p class="saju-label">1의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>기</td><td>병</td><td>정</td><td>병</td></tr>
+        <tr><td>사</td><td>인</td><td>묘</td><td>인</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 인중 갑목을 놓아 교육가 사주다.</p>
+
+    <p class="saju-label">2의 나</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>을</td><td>갑</td><td>을</td><td>임</td></tr>
+        <tr><td>축</td><td>인</td><td>해</td><td>오</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 춘하월 갑을일 사주에서 교육가가 되었다.</p>
+
+    <p class="saju-label">2의 다</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>임</td><td>갑</td><td>정</td><td>신</td></tr>
+        <tr><td>신</td><td>진</td><td>해</td><td>유</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 삼동월 사주에서 해당하며 교육가가 되었다.</p>
+
+    <p class="saju-label">3의 나</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>정</td><td>정</td><td>신</td><td>신</td></tr>
+        <tr><td>사</td><td>해</td><td>해</td><td>묘</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 동월에 금수 사주에서（해당하여）교육가가 되었다.</p>
+
+    <p class="saju-label">4의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>신</td><td>신</td><td>무</td><td>계</td></tr>
+        <tr><td>묘</td><td>유</td><td>술</td><td>축</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 유월에 출생하고 교육가가 되었다.</p>
+
+    <p class="saju-label">4의 라</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>신</td><td>신</td><td>무</td><td>계</td></tr>
+        <tr><td>축</td><td>유</td><td>술</td><td>묘</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 출생하고（이구월에 출생하여）교육가가 되었다.</p>
+
+    <p class="saju-label">5의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>기</td><td>병</td><td>정</td><td>무</td></tr>
+        <tr><td>사</td><td>진</td><td>묘</td><td>술</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 계인화에 인수 투출하고 교육가（인수경에）인수투출로 교육가가 되었다.</p>
+
+    <p class="saju-label">5의 다</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>계</td><td>계</td><td>계</td><td>계</td></tr>
+        <tr><td>해</td><td>해</td><td>해</td><td>해</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 해당하여 해당하는 경우에서 주해당하는（부동산장이） 교육계에서 일하는 사주다.</p>
+  </div>
+
+  <h3>◇ 언론계</h3>
+  <p>이 사주는 삼동월 금수일생에 출생하여 갑목 인수가 투출하고 교육가가 되었다. 또한 조선일보 이사장이 된 사주다.</p>
+
+  <h3>◇ 문예계</h3>
+  <p>이 사주는 해월 임일생이（후한나 출세하여） 국제방송국 과장의 사주다. 매에 금이 봉출하여 해월 임일생이 문예계에（또한 유력한） 사주에 해당한다.</p>
+
+  <h3>◇ 가요계</h3>
+  <p>이 사주는 봉인수경으로 하여 여류문인으로 달한 허씨 여사（남기인 것을）사주다.</p>
+
+  <h3>◇ 무용계</h3>
+  <p>이 사주는 춘생 을일로서 월달 봉인수경하여 무용계에서（한국 무용 발레의 작품）무용이 된 사주다.</p>
+
+  <h3>◇ 연예계</h3>
+  <p>이 사주는 을일 해월로 또한 월달 봉인수경하고 연예계에서 명성이 달하여（남의 성명을 남기어） 배우자 및 가수로서 명성 있는 일 여명의 사주다.</p>
+
+  <div class="reference">
+    <h3>〈연구〉</h3>
+    <p>이상의 실례 1·2·3은（사주에 해당하는 것이며）또한 오주에 해당하는 것을 백전금을을 아무리 월달 인수경하고（이 사주에 해당하는 것은）직접적으로 인수경국을 이루어서（또한 인수경에서 인수를 해당하는 것이며）이것이 또한 격국이 순수하게 구성된 있는 사주는 박사 대학 학장 총장의（네 사주에서）세가지 인수경을 놓은 사주에서（달한것을 보면） 삼중인수경을 놓은것이며 박사이며 대학 학장 총장에 이르면 고상학자라고 분명하다라고 기록되게 된 것이다.</p>
+  </div>
+
+  <div class="reference">
+    <h3>〈경험〉</h3>
+    <p>년월일시에 삼달 인수경이요（또한 보고 인수경격을 이루어서） 관인상생이요, 또한 인수가 있으니 삼달인수경이 되는 사주는 격국이 순수하고 년월일시에 삼중인수경이면 대학 학장이 되고（또한 삼중인수경이 년월일시에） 놓인 사주는 박사가 되고 대학 학장 총장에 이르면 고상학자에 분명하다 해서 이렇게 기록되게 된 것이다.</p>
+  </div>
+</section>
+
+<!-- 三三、경찰관하여 본다 -->
+<section class="page" id="topic-33">
+  <h2 class="topic-title">三三、경찰관하여 본다</h2>
+
+  <ol class="condition-list">
+    <li>1. 생기준으로 사주중에 진무기해자 중에 봉형겁자, 또는 봉사옥살자</li>
+    <li>2. 사주중에 진무기해자 중 봉사옥살 이상자</li>
+    <li>3. 인일생인이 사주중에서 견인 또는 견묘 또는 신한자, 사일생인이 사주중에서 견사한자, 인지일생인이 사주중에서 견인한자</li>
+  </ol>
+
+  <h3>〈해설〉</h3>
+  <p>서 인진무기해자 중（인자봉 일 자 이상한 자는） 또는 사주에서 기일생인이 사주중에서 견인한 자, 또는 해일생인이 사주중에서 견축 또는 신한자, 또는 견묘한자, 축일생인이 사주중에서 견유한자. 이 시란자의 해당하는 모두는 경찰（서 경찰,  경무관, 기타의 수사기관직을 한다 가지면.）</p>
+
+  <div class="reasoning">
+    <h3>○ 추리</h3>
+    <p class="indent">
+      생일은 자기이요, 감옥살인（우주의 옥인 것이라 하며 고로） 형살은 공갈협박이요, 또한 천라지망이라 하는 것이며（또한 형살을 쟁탈하기를 통하여） 붙잡는 것이며（매문이요）일강타진지라 하면은 나（이것을 쥐어） 로로 의미하는 것이 나이며 일강을 하면 그 그물을 쳐 놓는 것이요（또한 이것은 나를 의미하고 법률의 그물을 의미하여서）법의 소탕권이요, 수사권을 의미하는 것이요, 또한 형벌권을 의미하는 것이요, 관직에서 있어보게 되는 것이요 추리하는 것
+    </p>
+  </div>
+
+  <div class="example-section">
+    <h3>○ 실례</h3>
+    <p class="saju-label">1의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>병</td><td>기</td><td>갑</td><td>갑</td></tr>
+        <tr><td>인</td><td>사</td><td>오</td><td>자</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 기사일이 인사묘 삼달봉하고 무술으로 형살하여 경찰관（총경）이 되었던 사주다.</p>
+
+    <p class="saju-label">2의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>무</td><td>갑</td><td>을</td><td>병</td></tr>
+        <tr><td>술</td><td>축</td><td>유</td><td>인</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 오양인일에 해당하고 사주에서 삼달봉으로（또한）경찰관（경무관）이 되었던 사주다.</p>
+
+    <p class="saju-label">3의 나</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>갑</td><td>계</td><td>병</td><td>갑</td></tr>
+        <tr><td>사</td><td>유</td><td>자</td><td>자</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 진일생이 월봉진하여 경찰관（경감）이 되었고 경찰관 사주다. 하였고 경찰관（경위）이 되었던 사주다.</p>
+  </div>
+</section>
+
+<!-- 三四、의약업 하여 본다 -->
+<section class="page" id="topic-34">
+  <h2 class="topic-title">三四、의약업 하여 본다</h2>
+
+  <ol class="condition-list">
+    <li>1. 하추 신해묘유인월 일 달사축자 봉인형자</li>
+    <li>2. 오양인오일 달인무 달사자축 봉인시상 무술자</li>
+    <li>3. 인묘일 사주 해자일 모든 간 봉상관자 시생인월</li>
+    <li>4. 정묘일 사주 해자일 을생 시 정묘축일에</li>
+    <li>5. 인묘일 신해묘 유인월 봉달인 시상에 사해자축 인봉자</li>
+    <li>6. 기사일 사주 해자축（또는 봉사년 월 시）중 인봉하여</li>
+    <li>7. 신해일 신묘일 신축일에 출생한 자</li>
+  </ol>
+
+  <h3>〈해설〉</h3>
+  <p>사간에 갑을일 무술일 봉달인 시간에 출생한 자, 또는 인묘 시해 해자축 삼봉이상 이달인자, 또한 이 시간 인간에 술업이（모든 인간을 달한다 하면은） 이것은 의약업에 해당하는 것이다. 그리고 이 의약업은 인술로 하여금 의업에 통하는 것이니까（또한 이것은 인술 도술인 것이며） 인간 생사의 생명이요, 또한 도에 통하여 또한（인생이 귀한 업으로 이것에 해당하니） 인술 역시 도의 행하는 것임으로 이것에 해당하여 의약업이 되기 때문에 다루는 것이요, 또 인술은 도에서 인간의 생명을 다루는 것이요（또한 인과 도가 이루어져 인술이 직결되는데） 인술 역시 도의 행하는 것이다.</p>
+
+  <div class="reasoning">
+    <h3>○ 추리</h3>
+    <p class="indent">
+      1. 하추는 여하에 지궁 공통하기에 때문에 위해（해당한자 하면은） 의약업에 들어가는 것이요, 지지 명록의（지지에서 재에 해당하고 이에 해당한 자의 사주를 이르면 의약업이 되는 것으로 이것은） 의약업에 직접해 관계되는 것이며 상관은 의술이요, 이것은 의료 기술인 것이다.
+    </p>
+    <p class="indent">
+      그리고 이 의약업은 인술로서 통하는 것이요, 이것은 상관이면서 의술이 되고（또한 상관에 해당하는 의술을 해당하는 것이며） 이것은 의약업에 해당하는 것이다. 또한 월일생이 직결되는 것이며（또한 재관은 불가역할에） 의약업은 이것에 속하는 것이 되는 것이다.
+    </p>
+  </div>
+
+  <div class="example-section">
+    <h3>○ 실례</h3>
+    <p class="saju-label">1의 라</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>무</td><td>신</td><td>신</td><td>신</td></tr>
+        <tr><td>술</td><td>미</td><td>해</td><td>해</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 하기월에 해당하고（의사가）의사가 되었다.</p>
+
+    <p class="saju-label">2의 라</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>기</td><td>정</td><td>병</td><td>갑</td></tr>
+        <tr><td>유</td><td>사</td><td>인</td><td>신</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 사주에 해당하여 봉형하여（의사가）의사가 되었다.</p>
+
+    <p class="saju-label">3의 나</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>신</td><td>신</td><td>갑</td><td>신</td></tr>
+        <tr><td>묘</td><td>묘</td><td>자</td><td>해</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 해월에 해당（사주에서 봉형하여） 해당으로 의사가 되었다.</p>
+
+    <p class="saju-label">4의 라</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>갑</td><td>무</td><td>정</td><td>갑</td></tr>
+        <tr><td>인</td><td>술</td><td>축</td><td>인</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 무술일이 해당하고 하월에 봉 인묘에 출생하여（의사가 되었다.）</p>
+  </div>
+
+  <div class="reference">
+    <h3>〈참고〉</h3>
+    <p>자봉이 아니면（의약가가）부자가 못 되고（아버지가 되고）또한 자녀 교육에도 시키고 있는 것이다. 이것은 모두 의약에 속하는 것이고 약사가（한의사와 같이）의약분업으로 의약업에 속하는 것이다.</p>
+  </div>
+</section>
+
+<!-- 三五、재정공무원 하여본다 -->
+<section class="page" id="topic-35">
+  <h2 class="topic-title">三五、재정공무원 하여본다</h2>
+
+  <ol class="condition-list">
+    <li>1. 사주일봉재왕자</li>
+    <li>2. 관고신봉합자</li>
+  </ol>
+
+  <div class="reasoning">
+    <h3>○ 추리</h3>
+    <p class="indent">
+      사주에 재가 왕하면 재정관으로（재관이 되는 것이요）재왕하면 재정 공무원이 되어 직장에서 재를 장악하는 관직을（맡게 되는 것이며 또한 재가 관에 왕하면）재관에서 돈을 관장하는 것이다. 또한 관고신봉합이면 사주에서 재정관이 됨으로（재관에서 돈을 관장하는 사주인 것이다.）재전권을 가지고 있는 사주이기에 재정관（재정공무원이）되는 것이며 이것이야말로 재정을 맡아 보는 사주의 해당하는 사주가 되는 것이다.
+    </p>
+  </div>
+</section>
+
+<!-- 三六、법조계에 진출한 자 -->
+<section class="page" id="topic-36">
+  <h2 class="topic-title">三六、법조계에 진출한 자</h2>
+
+  <ol class="condition-list">
+    <li>1. 일주표준 병경성이 유한 자, 경일생이 사주에서 봉무해자</li>
+    <li>2. 수는 비천마성견격자, 경일생이 중견자한자</li>
+    <li>3. 정사일 을사일생인이 견사인한자, 기사일생인이 중견해자 견자한자, 경일생인이 중견자</li>
+    <li>4. 무기천마격 성견격자</li>
+  </ol>
+
+  <h3>〈해설〉</h3>
+  <p>사주에서 인진무기해자 중에 봉형겁자가 일주표준 병경성이 유한 자인데, 이는 사회를 보호하고 국가 안녕 질서의 기강을 세우고 용자를 배출하며, 제도하는（경찰자 혹은）법관이 되는 것이요, 또는 일주로 하여금 경찰격이 이루어져 경찰직, 검찰직에 직을 갖는 것이다.</p>
+
+  <div class="reasoning">
+    <h3>○ 추리</h3>
+    <p class="indent">1. 병은은 화목일주로 하여 예의를 아는 것이요, 또한 사회 질서를 대표하며 의리를 가진 것이며, 법관으로 되는 것은 이것이 형상이 되고, 또 목화는 따뜻한 지혜가 있으므로 경찰, 법관이 되어야 하는 것이다.</p>
+    <p class="indent">2. 수는 임계수로써 냉정하고, 공정하게 판단하여 재판하는 상이요, 법이란 자체가 냉정하고 공정무사하여야 하는 것이며, 임계수 일주로 이루어진 것은 법조계 사주다.</p>
+    <p class="indent">3. 정사일 또는 기사일생은 화관이요 이것은 목을 인으로 하여서 법관이 되는 것이며 지혜와 총명이 있는 법관이라 하는 상이다.</p>
+  </div>
+
+  <div class="example-section">
+    <h3>○ 실례</h3>
+    <p class="saju-label">1의 나</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>무</td><td>경</td><td>경</td><td>신</td></tr>
+        <tr><td>오</td><td>자</td><td>신</td><td>유</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 경일로 비견하고 금수가 왕하여 법관이 존경받는 사주이며, 검찰국장직에 합격하여 재임중에 있는 현 검사장의 사주다.</p>
+
+    <p class="saju-label">2의 나</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>갑</td><td>계</td><td>계</td><td>계</td></tr>
+        <tr><td>인</td><td>해</td><td>해</td><td>축</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 계해일로 임림사무 차관직 지낸바 있는 사주다.</p>
+
+    <p class="saju-label">3의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>계</td><td>계</td><td>계</td><td>계</td></tr>
+        <tr><td>해</td><td>해</td><td>축</td><td>축</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 종재하고 종재종살하여 고법사의 사주이며, 현 대검찰사가 된 사주다.</p>
+
+    <p class="saju-label">4의 나</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>신</td><td>신</td><td>병</td><td>갑</td></tr>
+        <tr><td>축</td><td>해</td><td>오</td><td>오</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 오화하며 현 대검찰사가 된 사주다.</p>
+  </div>
+
+  <div class="reference">
+    <h3>〈연구〉</h3>
+    <p>비천마론에서 사주를 보면 재관격을 이루면서 또한 인수경국이 있는 사주는 법사 대학 학장 총장의 사주가 되며 또한 법사 학위 정도에 이루어진 사주에 해당한다.</p>
+  </div>
+</section>
+
+<!-- 三七、역술계에 진출한다 -->
+<section class="page" id="topic-37">
+  <h2 class="topic-title">三七、역술계에 진출한다</h2>
+  <p>한밤 있는 모씨의 사주다.</p>
+
+  <ol class="condition-list">
+    <li>1. 삼삼항에 해당하는자, 의약가가 아니된 역술가요 또는 인수태왕에 관불족한 자</li>
+    <li>2. 병진일생인이 비교 신왕하면（장은 비교） 관불족한 자</li>
+    <li>3. 오양 을사일생인이 사주중에 봉재관인수한 자</li>
+    <li>4. 무신일 을묘일 을사일생인이 사주중에 다봉재성</li>
+    <li>5. 임자일 을해일 계묘일 을축일생인이 월（시간에 금수）혼합 또는 금다 수다한 자</li>
+  </ol>
+
+  <div class="reasoning">
+    <h3>○ 추리</h3>
+    <p class="indent">1. 삼삼명학에 비교 추리한바 있으므로 이곳에서는 풍수학, 성명학을 등장함이 맞다.</p>
+    <p class="indent">인수경이 왕하면（관불족은 글에 있으며） 인수가 행위로 나타나는 것이며 관이 없으면 관이 불족은 기예로서 조작 치를 하는 데（이것은） 술가로서 행하는 것이요, 관이 불족하면 역술인（명리학 관상）이 되는 것이다.</p>
+  </div>
+
+  <div class="example-section">
+    <h3>○ 실례</h3>
+    <p class="saju-label">1의 나</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>계</td><td>을</td><td>갑</td><td>계</td></tr>
+        <tr><td>해</td><td>축</td><td>자</td><td>해</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 을축일로 자월에 출생하여 이 사주에서 수목이 왕하면 청명다혜한 성인데 다시 사주중에 만물이 총명다혜하여 발달하며 지체로운 인술로 도에 통하는 상이 되어 역술계에 진출하게 된 것이다.</p>
+
+    <p class="saju-label">2의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>을</td><td>병</td><td>계</td><td>정</td></tr>
+        <tr><td>묘</td><td>진</td><td>묘</td><td>사</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 병진일에 인수경으로 역술계에 진출하여 선생님의 사주다.</p>
+  </div>
+</section>
+
+<!-- 三八、음식물업 하여 본다 -->
+<section class="page" id="topic-38">
+  <h2 class="topic-title">三八、음식물업 하여 본다</h2>
+
+  <ol class="condition-list">
+    <li>1. 임자일 무자일 진일에 출생한 자, 경신일 봉자진일에 출생한 자</li>
+    <li>2. 임신일 무자일 생한 자, 기축일의 봉재를 놓고 식신 재관을 놓은 자</li>
+    <li>3. 병신일 병자일 기일에 출생한 자, 경인일의 봉식신 재관을 놓은 자</li>
+    <li>4. 임자일중 가하한 일진에 출생한을 모두하고 상관재합격이나 상관생재격이나 또는 식신생재격</li>
+  </ol>
+
+  <div class="reasoning">
+    <h3>○ 추리</h3>
+    <p class="indent">임일은 수요 신자는 금이요 또는 수국으로서 월변이 길면（음식물이요） 상관생재를 이루면 음식물이 되고（또한 식신이 모두 수국으로서） 식신은 음식물의 형상이요, 식신은 금이요, 또한 재관을 이루면서（이상의 달로） 음식물업, 음식점이요, 요리사 등을 포함한다. 또한（음식물요관）조주하면 여관, 음식점, 주점, 카페, 또한 차방, 바, 외중, 양조장 등을 달한다.</p>
+  </div>
+
+  <div class="example-section">
+    <h3>○ 실례</h3>
+    <p class="saju-label">1의 나</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>경</td><td>병</td><td>갑</td><td>갑</td></tr>
+        <tr><td>진</td><td>자</td><td>자</td><td>술</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 모두 음식물업 하여 본다 음식물업 경영하고 있는 사주다.</p>
+
+    <p class="saju-label">2의 나</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>기</td><td>기</td><td>경</td><td>경</td></tr>
+        <tr><td>축</td><td>축</td><td>인</td><td>오</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 고등요리업을 경영하고（일 여명의）사주다.</p>
+  </div>
+</section>
+
+<!-- 三九、기생이란 직업 -->
+<section class="page" id="topic-39">
+  <h2 class="topic-title">三九、기생이란 직업</h2>
+
+  <ol class="condition-list">
+    <li>1. 을일생인이 사오월생인이 상관봉도한 자</li>
+    <li>2. 사주중 상관이 불견관 이면 축하면서 종재격이나 특별히 기생이 되는 것</li>
+    <li>3. 사주중에 관살이 왕하면서 상관식신의 불족한 자</li>
+  </ol>
+
+  <div class="reasoning">
+    <h3>○ 추리</h3>
+    <p class="indent">을일 병자시에（하단 사주에 해당하는 것이며）상관론은 연해자평 시부운 「상관불견관이라」 함이 위를 잘하지 못하면 남편이 불편하여 부녀 불목한 자（요 또는 과부가 되거나） 모두 이상과 같은（이유에서 나오는 것이니） 따라서 이상과 같이 이유하여 해당하여 기생이 되는 것이다.</p>
+  </div>
+
+  <div class="example-section">
+    <h3>○ 실례</h3>
+    <p>예술계나 가요계, 무용계 같은 데 나가면 좋다.</p>
+    <p class="saju-label">1의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>정</td><td>임</td><td>을</td><td>계</td></tr>
+        <tr><td>축</td><td>자</td><td>미</td><td>해</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 동월 을일생이（유시 출해서）기생이 된 사주에 해당하여 한자（기생이 된）사주다.</p>
+  </div>
+</section>
+
+<!-- 四〇、항공계 -->
+<section class="page" id="topic-40">
+  <h2 class="topic-title">四〇、항공계</h2>
+
+  <p>역마가 지살이요 현시대의 차요，또는 사와 인은 화（인중병화가）됨으로 역마로써 지살은 현시대의 차요, 비행기, 왕래하는（이 상이며 비행기는 공군, 비행사 등에 해당하며） 근무함이 있으면 되는 것이다.</p>
+
+  <div class="reasoning">
+    <h3>○ 추리</h3>
+    <p class="indent">역마가 지살은 현시대의 차요, 사와 인은 화（인중병화가）됨으로 비행기를 의미한다. 화는 하늘 상승하는 것이요 비행기가 상승하는 상인즉（비행기의 상이요）이것은 공군에 해당하며, 비행기를 해당하여（공군, 비행사로서）근무함이 있으면 되는 것이다.</p>
+  </div>
+
+  <div class="example-section">
+    <h3>○ 실례</h3>
+    <p class="saju-label">가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>계</td><td>신</td><td>신</td><td>을</td></tr>
+        <tr><td>사</td><td>사</td><td>해</td><td>해</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 사이 역마가 관명인데 비행사인（부군이） 항공사가 되었다.</p>
+
+    <p class="saju-label">나</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>병</td><td>신</td><td>을</td><td>신</td></tr>
+        <tr><td>인</td><td>사</td><td>해</td><td>사</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 사지 역마인데 일본기지에（해당하여）비행기 안내양이 된 사주다.</p>
+  </div>
+</section>
+
+<!-- 四一、외교관 가 본다 -->
+<section class="page" id="topic-41">
+  <h2 class="topic-title">四一、외교관 가 본다</h2>
+
+  <p>역마가 지살에 관 또는 인이 임한 자</p>
+
+  <h3>〈해설〉</h3>
+  <p>역마는 지살에 관성이 이루고 또는 인수가 관국을 이루고, 또한 외국에서 외무부, 타국 대사관 등에 립각하여 보게 된다.</p>
+
+  <div class="reasoning">
+    <h3>○ 추리</h3>
+    <p class="indent">역마 지살은 해외요, 지살에 관 또는 인이 임하면 역마 지살을 놓고（인수를 이것에 맞추어서）외교관, 통역관 등에 해당하여 보게 되는 것이다.</p>
+  </div>
+
+  <div class="example-section">
+    <h3>○ 실례</h3>
+    <p class="saju-label">가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>기</td><td>정</td><td>정</td><td>기</td></tr>
+        <tr><td>묘</td><td>묘</td><td>묘</td><td>묘</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 놓고 사주에서 인수를 이루어서 외교관이 된 사주다.</p>
+
+    <p class="saju-label">나</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>무</td><td>경</td><td>계</td><td>갑</td></tr>
+        <tr><td>진</td><td>자</td><td>묘</td><td>신</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 자묘에 해당하여 미국 여인과 결혼（한 사주에서）해외에서 일하는 외교관 사주다.</p>
+  </div>
+</section>
+
+<!-- 四二、종교 신앙 있다 -->
+<section class="page" id="topic-42">
+  <h2 class="topic-title">四二、종교 신앙 있다</h2>
+
+  <ol class="condition-list">
+    <li>1. 정하 추동생 무기일 사주에서 출생한 자</li>
+    <li>2. 인신일 사해월 신유월 생인이 사주에서 출생한 자</li>
+    <li>3. 갑술일 을묘일 사추에 달하고 무기일 오미월에 생한 자</li>
+    <li>4. 무신일 무인일 사추에서 달하고 감자일 금수 혼합 다봉한 자</li>
+    <li>5. 임자일 을해일 사추에서 금수 달한 혼합 또는 수다 또는 금다한 자</li>
+    <li>6. 임신일 출생한 자 기타 대후에 해당 종교 신앙자 또는 종교인</li>
+  </ol>
+
+  <div class="reasoning">
+    <h3>○ 추리</h3>
+    <p class="indent">1. 인하월（사오미월）은 화왕하고 또한 무기일생이면 화기가 융합하여 각 화하면 목의 인이 나무이어야 화기 왕성한 것이 되면서（인이 되니） 비로소 설교하는 상이요 또는 인술로 통하는 것이다.</p>
+    <p class="indent">2. 수왕 금합으로 금수쌍청가도라 하는 것이요, 인은 원시가 인（사주에서）목왕 월에 인은 선각하여（천통하여）인이（월에서 인이）천통에 도（도에 통하여） 인이 이루어 설과 동（달하여 설과 같이）되는 것이다.</p>
+  </div>
+
+  <div class="example-section">
+    <h3>○ 실례</h3>
+    <p class="saju-label">1의 다</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>정</td><td>갑</td><td>갑</td><td>병</td></tr>
+        <tr><td>미</td><td>인</td><td>인</td><td>인</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 정하 추생으로（국조 신앙에） 해당하여 기독교 신자가 된 사주다.</p>
+
+    <p class="saju-label">2의 나</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>경</td><td>경</td><td>계</td><td>정</td></tr>
+        <tr><td>인</td><td>신</td><td>해</td><td>미</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 추동월 계해에서 해당하여 기독교 신자가 된 사주다.</p>
+  </div>
+</section>
+
+<!-- 四三、본처·편처 문제 -->
+<section class="page" id="topic-43">
+  <h2 class="topic-title">四三、본처·편처 문제</h2>
+
+  <ol class="condition-list">
+    <li>1. 시상편관은 처궁이 일주 대 편재（여 갑일 편재）감으로 인하여 편처</li>
+    <li>2. 임년 계월 무기일 생에 처궁 자축이요 수요 천일생수로（천일생수는 처궁인데） 그 처궁이 의미하는 것은 처와 인척 관계를 달한다</li>
+    <li>3. 시상봉공 년월 무기축자 일봉 편처 원배우자의 원기 강하여 시지에 비겁 상충이 되거나</li>
+  </ol>
+
+  <div class="reasoning">
+    <h3>○ 추리</h3>
+    <p class="indent">시상편관은 처궁이니（처궁이 일지에서）대하는 것이요 또한（일주 대에서 편재로서）인하여 편처를 달한다. 비겁이 왕하면 일주 자체 또한 지지에서 비견이 처궁이며（일주에 대한 것이요）비견 상충이 되면（또는 충돌이 일어나면）대오 오해 천처 되어야 하는 상이다.</p>
+  </div>
+
+  <div class="example-section">
+    <h3>○ 실례</h3>
+    <p class="saju-label">1의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>임</td><td>갑</td><td>병</td><td>무</td></tr>
+        <tr><td>인</td><td>인</td><td>술</td><td>술</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 갑인일로 임년 계월 편재하여 본처 본처조로（편처 봉편해）이합한 사주다.</p>
+
+    <p class="saju-label">2의 나</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>경</td><td>을</td><td>계</td><td>병</td></tr>
+        <tr><td>인</td><td>묘</td><td>해</td><td>인</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 을묘일로 상편재하면 본처조 봉편해로 난별하였다.</p>
+  </div>
+</section>
+
+<!-- 四四、악처 -->
+<section class="page" id="topic-44">
+  <h2 class="topic-title">四四、악처</h2>
+
+  <ol class="condition-list">
+    <li>1. 사주에 재가 있으나 처요를 제하면（또는 재하지） 형으로써 이것을 달하며</li>
+    <li>2. 사주중에 귀문관살을 놓은 자（또한 이것을 달하면）악처 사주이다</li>
+    <li>3. 갑진 을미 재 사주에서 축오일 재 사주에서 재가 왕한 자</li>
+  </ol>
+
+  <div class="reasoning">
+    <h3>○ 추리</h3>
+    <p class="indent">이상을 놓으면 일시에 충하여 서로 맞추어 처궁에서（또한 처가 충돌하면）일시에 충이 나타나면 악처 형상이 되고 처에게 해를 달하는 것이다. 또한 일시 상충이 되면 부부 사이에 불화가 되고 또한 처가 악하게 나타나는 것이요 이것은 처궁이 충돌이 되면（또한）처가 반항하여 나타나는 것이다.</p>
+  </div>
+
+  <div class="example-section">
+    <h3>○ 실례</h3>
+    <p class="saju-label">1의 가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>임</td><td>갑</td><td>정</td><td>무</td></tr>
+        <tr><td>인</td><td>인</td><td>묘</td><td>술</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 편관을 놓고（시상에서 처궁 충돌하여）본처에도 악처를 봉하였다.</p>
+  </div>
+</section>
+
+<!-- 四五、처 흉사 -->
+<section class="page" id="topic-45">
+  <h2 class="topic-title">四五、처 흉사</h2>
+  <p>국제이성에 교정 있다</p>
+
+  <ol class="condition-list">
+    <li>1. 갑인일생 견사·을사일생 견사하거나 병인일생인이 견인 또는 신한자</li>
+    <li>2. 갑진일생 을미일생 축일 흉사하거나 재가 왕하고 백호대살에 사주</li>
+    <li>3. 축일 흉사일 사주 충일에 충돌이 강하여 처 사산이 중하며 재성 흉사가 있는 사주</li>
+  </ol>
+
+  <div class="reasoning">
+    <h3>○ 추리</h3>
+    <p class="indent">사주에 재가 있는 것을 처요라 하며（재를 달하면 처에 관한 일이며）형으로써 이것을 하여 충돌하면 처가 흉사하여 나타나는 것이요 또한 백호대살이 사주에서 재와 같이 있으면（또한 처가 흉사하는 것이며）이 때문에 조심하여야 하는 사주이다.</p>
+  </div>
+
+  <div class="example-section">
+    <h3>○ 실례</h3>
+    <p class="saju-label">1의 라</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>정</td><td>계</td><td>신</td><td>임</td></tr>
+        <tr><td>미</td><td>사</td><td>미</td><td>인</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 사시에 재봉충하여 사주 본처조에 기처가 흉사한 사주이다. 그 뒤 재차 재봉하여 기처 조에 해당된 사주다.</p>
+  </div>
+</section>
+
+<!-- 四六、재혼하여 본다 -->
+<section class="page" id="topic-46">
+  <h2 class="topic-title">四六、재혼하여 본다</h2>
+  <p>지장재성이 타 사주와 합산자, 무기일생 화국</p>
+
+  <ol class="condition-list">
+    <li>1. 지장재성이 지지 봉재성을 합하고 타 사주와（합산）합산자</li>
+    <li>2. 동 정갑을 임일생에 날시 도화봉한 일에 지지중에（도화봉이 나타나면）이에서 재혼</li>
+  </ol>
+
+  <div class="reasoning">
+    <h3>○ 추리</h3>
+    <p class="indent">지장재성은 지지 봉재성을 합하고, 이것은 재혼하게 되는 것이며 합산은 합산하게 되어서 타 사주와 합산하여 봉재한 자가（또한） 재혼하는 상이 되는 것이다.</p>
+  </div>
+
+  <div class="example-section">
+    <h3>○ 실례</h3>
+    <p class="saju-label">1의 나</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>기</td><td>무</td><td>을</td><td>무</td></tr>
+        <tr><td>미</td><td>사</td><td>사</td><td>인</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 지지 사에 화국으로 재혼한 사주에 해당한다.</p>
+  </div>
+</section>
+
+<!-- 四七、팔혼처 (본부처 봉편해자) -->
+<section class="page" id="topic-47">
+  <h2 class="topic-title">四七、팔혼처</h2>
+  <p>여명은 모두 본부 이별하고 내겠 머리에 놓은（이에 해당하는 사주다）</p>
+
+  <ol class="condition-list">
+    <li>1. 상관태왕에 관을 제하면 남편 이별하고（또한 하나의 조건이요）</li>
+    <li>2. 교살월 및 오행으로 금수에 응해야만 유한 경우에 이혼하게 되면</li>
+  </ol>
+
+  <div class="reasoning">
+    <h3>○ 추리</h3>
+    <p class="indent">여명은 본부 이별하고（처에 해당하여）봉편해로 나타나면 이별하는 상이 되고 또한 이것은 반드시 남편의 이별 시기에 해당하여 이혼（또는 이별 되는 것이다.）</p>
+  </div>
+
+  <div class="example-section">
+    <h3>○ 실례</h3>
+    <p class="saju-label">가</p>
+    <div class="saju-chart">
+      <table>
+        <tr class="header"><td>시</td><td>일</td><td>월</td><td>년</td></tr>
+        <tr><td>무</td><td>무</td><td>갑</td><td>갑</td></tr>
+        <tr><td>인</td><td>신</td><td>인</td><td>인</td></tr>
+      </table>
+    </div>
+    <p>이 사주는 갑인재살이 왕하고 자자살이 고립왕하여 봉충하여 재살왕하면서 자자 왕하여 이혼하고 또 재혼하게 된 사주에 해당한다.</p>
+  </div>
+
+  <div class="reference">
+    <h3>〈연구〉</h3>
+    <p>이 사주에서는 삼삼항의 4，정묘사항도 해당하며 또한 병술사항도 해당하면서 역술계에 해당하여 선생님의 사주이다. 또한 이것은 이구항으로 하여 정묘일으로 해당하면서 선생의 사주가 되었다.</p>
+  </div>
+</section>
+
+<!-- 부록: 명리정종 육친설 -->
+<section class="page" id="appendix-1">
+  <h2 class="topic-title">부록 ― 명리정종 권일 오항 육친설</h2>
+
+  <p>목화무정이라 함은 을사일 본문에 말함인데, 그 뜻은 을사일생은 남성은（남자에게는）을목이 처궁이요, 일간 을목이 처에 속하니（처가 되는 것이요）또한 재성에 달하여 일간에서 암장되어 있는 것인데（일지에서 암장되어 있으니） 처궁에 재가 왕하면（처재가）밝혀지는 것이다.</p>
+  <p>이상 오항 육친설에서 일생은 을사일생 말함이요, 갑인일은（일의 순서는）갑（을로서）목화 에 해당하는 것이며（목이니 간이요 화이니 장이요 사이니 관이요） 금은 재요 인은 관이요 사는 인이요（관인이 처에 해당하니）</p>
+
+  <p>갑인일은 처이 지지에서 사성봉이 왕하고 또한 일지에서 재가 암장되어 있으니, 암장재와 합산한 자（달하면 합산하는 상이 되어서）재혼하는 것이요, 절관은 （인의 관을 절하고 합하면서 합산을 하는 것은） 절관이 되면 합하여 재혼하는 것이니, 이것이 또한（이것을 해설하면）명리정종에서 상세히 설하고 있는 것이다.</p>
+
+  <p>또한 화관이 생관하면（또한 을사일） 사에서 병화가 을목에서 화로 인하여 생하고（또한 임수가 해에서 을목에 해수와 합하면서）관인이 생하여（재가 합하여）처에 해당한다. 을사일에서는 관인상생하고（또한 처의 재가 합하여서）재혼하는 상이 되는 것을（이것을 또한 명리정종에서 이 관계를 상세히 밝히고 있는 것이다.）</p>
+</section>
+
+<!-- 완결 -->
+<section class="page page-ending">
+  <h2 style="font-size: 28px; margin-bottom: 20px;">사주첩경 권이 ― 응용추리편</h2>
+  <p style="font-size: 18px; margin-bottom: 10px;">이석영 저</p>
+  <p style="font-size: 16px; color: #888;">― 완 ―</p>
+</section>
+
+</main>
+
+<!-- Bottom Bar -->
+<footer class="bottom-bar">
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="nav-controls">
+    <button class="nav-btn" onclick="prevPage()" aria-label="이전">&#8249;</button>
+    <span class="page-indicator" id="pageIndicator">1 / 1</span>
+    <button class="nav-btn" onclick="nextPage()" aria-label="다음">&#8250;</button>
+  </div>
+</footer>
+
+<script>
+(function() {
+  'use strict';
+
+  const pages = Array.from(document.querySelectorAll('.page'));
+  const totalPages = pages.length;
+  let currentPage = 0;
+  let transitioning = false;
+
+  const STORAGE_KEY = 'saju2_currentPage';
+  const FONT_KEY = 'saju2_fontSize';
+  const THEME_KEY = 'saju2_theme';
+
+  // === Initialize ===
+  function init() {
+    // Restore saved page
+    const saved = parseInt(localStorage.getItem(STORAGE_KEY));
+    if (!isNaN(saved) && saved >= 0 && saved < totalPages) {
+      currentPage = saved;
+    }
+    pages.forEach((p, i) => {
+      p.classList.toggle('active', i === currentPage);
+    });
+
+    // Restore font size
+    const savedSize = localStorage.getItem(FONT_KEY);
+    if (savedSize) setFontSize(parseInt(savedSize), true);
+
+    // Restore theme
+    const savedTheme = localStorage.getItem(THEME_KEY);
+    if (savedTheme) setTheme(savedTheme, true);
+
+    buildTOC();
+    updateUI();
+    setupTouch();
+    setupKeyboard();
+  }
+
+  // === Navigation ===
+  function goToPage(n, direction) {
+    if (n < 0 || n >= totalPages || n === currentPage || transitioning) return;
+    transitioning = true;
+
+    const oldPage = pages[currentPage];
+    const newPage = pages[n];
+    const dir = direction || (n > currentPage ? 'next' : 'prev');
+
+    const startX = dir === 'next' ? '100%' : '-100%';
+    const endX = dir === 'next' ? '-100%' : '100%';
+
+    // Prepare new page
+    newPage.style.display = 'block';
+    newPage.style.transform = 'translateX(' + startX + ')';
+    newPage.scrollTop = 0;
+
+    // Force reflow
+    void newPage.offsetHeight;
+
+    // Animate
+    oldPage.style.transition = 'transform 0.28s ease-out';
+    newPage.style.transition = 'transform 0.28s ease-out';
+    oldPage.style.transform = 'translateX(' + endX + ')';
+    newPage.style.transform = 'translateX(0)';
+
+    setTimeout(function() {
+      oldPage.classList.remove('active');
+      oldPage.style.display = '';
+      oldPage.style.transform = '';
+      oldPage.style.transition = '';
+
+      newPage.classList.add('active');
+      newPage.style.display = '';
+      newPage.style.transform = '';
+      newPage.style.transition = '';
+
+      currentPage = n;
+      transitioning = false;
+      updateUI();
+      localStorage.setItem(STORAGE_KEY, currentPage);
+    }, 290);
+  }
+
+  window.nextPage = function() { goToPage(currentPage + 1, 'next'); };
+  window.prevPage = function() { goToPage(currentPage - 1, 'prev'); };
+
+  // === Update UI ===
+  function updateUI() {
+    document.getElementById('pageIndicator').textContent =
+      (currentPage + 1) + ' / ' + totalPages;
+    document.getElementById('progressFill').style.width =
+      (((currentPage + 1) / totalPages) * 100) + '%';
+  }
+
+  // === Touch / Swipe ===
+  function setupTouch() {
+    var startX = 0, startY = 0, startTime = 0;
+    var container = document.getElementById('bookContainer');
+
+    container.addEventListener('touchstart', function(e) {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      startTime = Date.now();
+    }, { passive: true });
+
+    container.addEventListener('touchend', function(e) {
+      var dx = e.changedTouches[0].clientX - startX;
+      var dy = e.changedTouches[0].clientY - startY;
+      var dt = Date.now() - startTime;
+
+      // Horizontal swipe: fast enough, mostly horizontal
+      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.2 && dt < 600) {
+        if (dx < 0) nextPage();
+        else prevPage();
+      }
+    }, { passive: true });
+
+    // Tap zones (left 20% = prev, right 20% = next)
+    container.addEventListener('click', function(e) {
+      // Don't navigate if clicked on interactive element
+      if (e.target.closest('a, button, table, .saju-chart')) return;
+
+      var x = e.clientX;
+      var w = window.innerWidth;
+      if (x < w * 0.2) prevPage();
+      else if (x > w * 0.8) nextPage();
+    });
+  }
+
+  // === Keyboard ===
+  function setupKeyboard() {
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'ArrowRight') nextPage();
+      else if (e.key === 'ArrowLeft') prevPage();
+    });
+  }
+
+  // === TOC ===
+  function buildTOC() {
+    var sidebar = document.getElementById('tocSidebar');
+    pages.forEach(function(page, i) {
+      var titleEl = page.querySelector('.topic-title') ||
+                    page.querySelector('h1') ||
+                    page.querySelector('.bal-title') ||
+                    page.querySelector('.main-title');
+      var label;
+      if (page.classList.contains('title-page')) {
+        label = '표지';
+      } else if (titleEl) {
+        label = titleEl.textContent.trim();
+        if (label.length > 30) label = label.substring(0, 30) + '...';
+      } else {
+        label = '페이지 ' + (i + 1);
+      }
+
+      var item = document.createElement('div');
+      item.className = 'toc-item';
+      item.textContent = label;
+      item.onclick = function() {
+        goToPage(i);
+        toggleTOC();
+      };
+      sidebar.appendChild(item);
+    });
+  }
+
+  window.toggleTOC = function() {
+    document.getElementById('tocSidebar').classList.toggle('open');
+    document.getElementById('tocOverlay').classList.toggle('open');
+    // Close settings if open
+    document.getElementById('settingsPopup').classList.remove('open');
+  };
+
+  // === Settings ===
+  window.toggleSettings = function() {
+    document.getElementById('settingsPopup').classList.toggle('open');
+    // Close TOC if open
+    document.getElementById('tocSidebar').classList.remove('open');
+    document.getElementById('tocOverlay').classList.remove('open');
+  };
+
+  window.setFontSize = function(size, silent) {
+    document.documentElement.style.setProperty('--font-size', size + 'px');
+    localStorage.setItem(FONT_KEY, size);
+    // Update button states
+    document.querySelectorAll('.size-btn').forEach(function(btn) {
+      btn.classList.toggle('active', parseInt(btn.dataset.size) === size);
+    });
+  };
+
+  window.setTheme = function(theme, silent) {
+    document.body.classList.remove('theme-light', 'theme-sepia', 'theme-dark');
+    if (theme !== 'light') document.body.classList.add('theme-' + theme);
+    localStorage.setItem(THEME_KEY, theme);
+    // Update button states
+    document.querySelectorAll('.theme-btn').forEach(function(btn) {
+      btn.classList.toggle('active', btn.classList.contains(theme));
+    });
+  };
+
+  // Close settings on outside click
+  document.addEventListener('click', function(e) {
+    var popup = document.getElementById('settingsPopup');
+    if (popup.classList.contains('open') &&
+        !popup.contains(e.target) &&
+        !e.target.closest('.top-bar button[aria-label="설정"]')) {
+      popup.classList.remove('open');
+    }
+  });
+
+  // === Init ===
+  init();
+})();
+</script>
+
+</body>
+</html>
