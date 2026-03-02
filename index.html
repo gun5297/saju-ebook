@@ -173,6 +173,21 @@
     min-width: 60px;
     text-align: center;
     font-variant-numeric: tabular-nums;
+    cursor: pointer;
+  }
+
+  .page-input {
+    width: 44px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 4px;
+    color: var(--bar-text);
+    font-size: 13px;
+    text-align: center;
+    padding: 2px 4px;
+    font-family: inherit;
+    font-variant-numeric: tabular-nums;
+    outline: none;
   }
 
   /* === Typography === */
@@ -7312,7 +7327,7 @@
   <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
   <div class="nav-controls">
     <button class="nav-btn" onclick="prevPage()" aria-label="이전">&#8249;</button>
-    <span class="page-indicator" id="pageIndicator">1 / 1</span>
+    <span class="page-indicator" id="pageIndicator" onclick="showPageInput()">1 / 1</span>
     <button class="nav-btn" onclick="nextPage()" aria-label="다음">&#8250;</button>
   </div>
 </footer>
@@ -7402,10 +7417,44 @@
   window.nextPage = function() { goToPage(currentPage + 1, 'next'); };
   window.prevPage = function() { goToPage(currentPage - 1, 'prev'); };
 
+  // === Page Input ===
+  window.showPageInput = function() {
+    var indicator = document.getElementById('pageIndicator');
+    var input = document.createElement('input');
+    input.type = 'number';
+    input.className = 'page-input';
+    input.min = 1;
+    input.max = totalPages;
+    input.value = currentPage + 1;
+
+    var suffix = document.createTextNode(' / ' + totalPages);
+
+    indicator.textContent = '';
+    indicator.appendChild(input);
+    indicator.appendChild(suffix);
+    input.focus();
+    input.select();
+
+    function commit() {
+      var val = parseInt(input.value);
+      if (!isNaN(val) && val >= 1 && val <= totalPages) {
+        goToPage(val - 1);
+      }
+      updateUI();
+    }
+
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') { e.preventDefault(); commit(); }
+      else if (e.key === 'Escape') { updateUI(); }
+      e.stopPropagation();
+    });
+    input.addEventListener('blur', commit);
+  };
+
   // === Update UI ===
   function updateUI() {
-    document.getElementById('pageIndicator').textContent =
-      (currentPage + 1) + ' / ' + totalPages;
+    var indicator = document.getElementById('pageIndicator');
+    indicator.textContent = (currentPage + 1) + ' / ' + totalPages;
     document.getElementById('progressFill').style.width =
       (((currentPage + 1) / totalPages) * 100) + '%';
   }
